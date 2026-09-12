@@ -46,7 +46,6 @@ module.exports = async function handler(req, res) {
   const wallet = String(body.wallet || '').trim();
   const sharedPostUrl = String(body.shared_post_url || '').trim();
   const answers = body.answers;
-  const social = body.social || {};
 
   if (!validX(xUsername)) {
     return json(res, 400, { ok: false, error: 'INVALID_X_USERNAME' });
@@ -57,9 +56,6 @@ module.exports = async function handler(req, res) {
   if (!validAnswers(answers)) {
     return json(res, 400, { ok: false, error: 'INVALID_ANSWERS' });
   }
-  if (!(social.follow === true && social.like === true && social.repost === true && social.comment === true)) {
-    return json(res, 400, { ok: false, error: 'SOCIAL_TASKS_INCOMPLETE' });
-  }
   if (!validSharedPost(sharedPostUrl)) {
     return json(res, 400, { ok: false, error: 'INVALID_SHARED_POST_URL' });
   }
@@ -69,11 +65,7 @@ module.exports = async function handler(req, res) {
     wallet: wallet.toLowerCase(),
     answers,
     genesis_signal: signalFromAnswers(answers),
-    shared_post_url: sharedPostUrl,
-    follow_claimed: true,
-    like_claimed: true,
-    repost_claimed: true,
-    comment_claimed: true
+    shared_post_url: sharedPostUrl
   };
 
   try {
