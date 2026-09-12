@@ -116,41 +116,26 @@ render();
 window.setPage=setPage;window.pickAnswer=pickAnswer;window.nextQ=nextQ;window.prevQ=prevQ;window.showShareCard=showShareCard;window.connectWallet=connectWallet;window.disconnectWallet=disconnectWallet;window.openGenome=openGenome;window.setDecision=setDecision;window.updateField=updateField;window.copyShareText=copyShareText;window.shareOnX=shareOnX;window.submitPreviewApplication=submitPreviewApplication;window.runChecker=runChecker;
 </script>
 <style>
-.social-tasks{margin-top:24px;padding-top:22px;border-top:1px solid #25384c}.social-tasks-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;margin-bottom:12px}.social-tasks-head p{font-size:12px;margin:0;color:var(--muted)}.social-task-list{display:grid;gap:9px}.social-task{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:12px 13px;border:1px solid #293d52;border-radius:12px;background:#09131e}.social-task.done{border-color:#3d603a;background:rgba(141,255,124,.035)}.social-task-name{min-width:0}.social-task-name strong{display:block;font-size:13px;color:#dce4e9}.social-task-name span{display:block;font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted);margin-top:3px}.social-task .pending-link{font:10px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#778895;border:1px solid #2b3d50;border-radius:9px;padding:8px 10px;white-space:nowrap}.social-lock-note{margin-top:12px;font-size:12px;color:var(--warn)}.question.social-locked{opacity:.46}.question.social-locked .option{pointer-events:none}.social-done-btn{min-width:92px}@media(max-width:760px){.social-tasks-head{align-items:flex-start;flex-direction:column}.social-task{grid-template-columns:1fr auto}.social-task .pending-link{grid-column:1/2;grid-row:2}.social-done-btn{grid-column:2;grid-row:1/3}}
+.social-tasks{margin-top:24px;padding-top:22px;border-top:1px solid #25384c}.social-tasks-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;margin-bottom:12px}.social-tasks-head p{font-size:12px;margin:0;color:var(--muted)}.social-task-list{display:grid;gap:9px}.social-task{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 13px;border:1px solid #293d52;border-radius:12px;background:#09131e}.social-task-name{min-width:0}.social-task-name strong{display:block;font-size:13px;color:#dce4e9}.social-task-name span{display:block;font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted);margin-top:3px}.social-task-link{font:10px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;border:1px solid #2b3d50;border-radius:9px;padding:8px 10px;white-space:nowrap;text-decoration:none}.social-task-link.ready{color:var(--lime);border-color:#425729}.social-task-link.pending{color:#778895;cursor:default}.social-review-note{margin-top:12px;font-size:12px;color:var(--muted)}@media(max-width:760px){.social-tasks-head{align-items:flex-start;flex-direction:column}.social-task{grid-template-columns:1fr}.social-task-link{justify-self:start}}
 </style>
 <script>
 const SOCIAL_LINKS={profile:'',whitelistPost:''};
-state.socialTasks={follow:false,like:false,repost:false,comment:false};
 const _baseWhitelistPage=whitelistPage;
-const _baseChecklistHtml=checklistHtml;
-const _basePickAnswer=pickAnswer;
-function allSocialDone(){return Object.values(state.socialTasks).every(Boolean)}
-shareGenerated=function(){return state.q>=6&&allAnswered()&&allSocialDone()};
-canGenerateShare=function(){return validX()&&validWallet()&&allSocialDone()&&allAnswered()};
-canSubmit=function(){return validX()&&validWallet()&&allSocialDone()&&allAnswered()&&shareGenerated()&&validSharedPost()};
-function toggleSocialTask(key){if(!(key in state.socialTasks))return;state.socialTasks[key]=!state.socialTasks[key];state.applicationSubmitted=false;if(!allSocialDone()&&state.q>5)state.q=5;render()}
 function socialTaskHtml(){
   const tasks=[
-    ['follow','Follow @Candlekin','Follow the official Candlekin account.','profile'],
-    ['like','Like whitelist post','Like the official whitelist post.','whitelistPost'],
-    ['repost','Repost whitelist post','Repost the official whitelist post.','whitelistPost'],
-    ['comment','Comment on whitelist post','Leave a comment on the official whitelist post.','whitelistPost']
+    ['Follow @Candlekin','Follow the official Candlekin account.','profile','FOLLOW ON X ↗'],
+    ['Like whitelist post','Like the official whitelist post.','whitelistPost','OPEN POST ↗'],
+    ['Repost whitelist post','Repost the official whitelist post.','whitelistPost','OPEN POST ↗'],
+    ['Comment on whitelist post','Leave a comment on the official whitelist post.','whitelistPost','OPEN POST ↗']
   ];
-  return `<div class="social-tasks"><div class="social-tasks-head"><div><div class="eyebrow" style="margin-bottom:7px">Social tasks</div><h3 style="margin:0">Complete X tasks first.</h3></div><p>Links will be wired when the official X profile and WL post URLs are final.</p></div><div class="social-task-list">${tasks.map(([key,title,desc,linkKey])=>{const done=state.socialTasks[key],ready=Boolean(SOCIAL_LINKS[linkKey]);return `<div class="social-task ${done?'done':''}"><div class="social-task-name"><strong>${title}</strong><span>${desc}</span></div><span class="pending-link">${ready?'OPEN X ↗':'LINK PENDING'}</span><button class="btn small ${done?'':'secondary'} social-done-btn" type="button" onclick="toggleSocialTask('${key}')">${done?'✓ DONE':'MARK DONE'}</button></div>`}).join('')}</div>${allSocialDone()?'':`<div class="social-lock-note">Complete all 4 social tasks to unlock Genesis calibration.</div>`}<div class="field-help" style="margin-top:10px">Preview uses self-confirmation only. Production verification can be connected later.</div></div>`
+  return `<div class="social-tasks"><div class="social-tasks-head"><div><div class="eyebrow" style="margin-bottom:7px">Social tasks</div><h3 style="margin:0">Support Candlekin on X.</h3></div><p>Official X links will be connected once the profile and whitelist post URLs are final.</p></div><div class="social-task-list">${tasks.map(([title,desc,linkKey,cta])=>{const url=SOCIAL_LINKS[linkKey];return `<div class="social-task"><div class="social-task-name"><strong>${title}</strong><span>${desc}</span></div>${url?`<a class="social-task-link ready" href="${url}" target="_blank" rel="noopener noreferrer">${cta}</a>`:`<span class="social-task-link pending">LINK PENDING</span>`}</div>`}).join('')}</div><div class="social-review-note">Social participation is part of whitelist review. No self-confirmation is required.</div></div>`
 }
-checklistHtml=function(){const rows=[['X username',validX()],['EVM wallet',validWallet()],['Follow @Candlekin',state.socialTasks.follow],['Like WL post',state.socialTasks.like],['Repost WL post',state.socialTasks.repost],['Comment WL post',state.socialTasks.comment],['6 calibration answers',allAnswered()],['Genesis share card',shareGenerated()],['Shared X post URL',validSharedPost()]];return `<div class="checklist"><div class="tiny">Application checklist</div>${rows.map(([n,ok])=>`<div class="check-item ${ok?'done':'todo'}"><span>${n}</span><strong>${ok?'READY':'REQUIRED'}</strong></div>`).join('')}</div>`};
-pickAnswer=function(q,i){if(!allSocialDone())return;_basePickAnswer(q,i)};
 whitelistPage=function(){
   let html=_baseWhitelistPage();
   if(state.phase!=='WHITELIST_OPEN')return html;
-  html=html.replace('Preview validation is strict: X, wallet, all six answers and the shared X post URL are required.','Preview validation is strict: X, wallet, all four social tasks, six calibration answers and the shared X post URL are required.');
-  const marker='<div class="question">';
-  const questionStart=allSocialDone()?marker:'<div class="question social-locked">';
-  html=html.replace(marker,socialTaskHtml()+questionStart);
+  html=html.replace('<div class="question">',socialTaskHtml()+'<div class="question">');
   return html;
 };
-window.toggleSocialTask=toggleSocialTask;
-window.pickAnswer=pickAnswer;
 render();
 </script>
 </body>
