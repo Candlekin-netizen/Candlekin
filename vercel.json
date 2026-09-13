@@ -3,7 +3,7 @@
   "routes": [
     {
       "src": "^/$",
-      "dest": "/api/page-mint-fixed"
+      "dest": "/api/page-market"
     },
     {
       "src": "^/admin/?$",
