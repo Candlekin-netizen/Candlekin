@@ -14,6 +14,7 @@ module.exports = async function handler(req, res) {
     }
 
     let html = await source.text();
+
     const oldSubmit = "function submitPreviewApplication(){if(!canSubmit()){syncWhitelistValidity();return}state.applicationSubmitted=true;render()}";
     const liveSubmit = `async function submitPreviewApplication(){
   if(!canSubmit()){syncWhitelistValidity();return}
@@ -63,8 +64,66 @@ module.exports = async function handler(req, res) {
       res.statusCode = 500;
       return res.end('Whitelist submit hook not found.');
     }
-
     html = html.replace(oldSubmit, liveSubmit);
+
+    const oldCheckerNotice = '<div class="notice">Preview: <span class="mono">0x1111...1111</span> = GTD, <span class="mono">0x2222...2222</span> = FCFS. Other valid wallets = Public-only.</div>';
+    const liveCheckerNotice = '<div class="notice">Enter the same wallet address used for your whitelist application. Results are read live from the finalized curation database.</div>';
+    if (html.includes(oldCheckerNotice)) {
+      html = html.replace(oldCheckerNotice, liveCheckerNotice);
+    }
+
+    const oldChecker = "function runChecker(){const v=(document.getElementById('checkerInput')?.value||'').trim().toLowerCase(),box=document.getElementById('checkerResult');if(!box)return;box.classList.add('active');if(!/^0x[a-f0-9]{40}$/.test(v)){box.innerHTML=`<div class=\"card\"><div class=\"result-badge none\">Invalid wallet</div><p style=\"margin-top:12px\">Enter a valid EVM wallet address.</p></div>`;return}const r=checkerDB[v];if(r==='GTD'){box.innerHTML=`<div class=\"card\"><div class=\"result-badge gtd\">GTD</div><h3 style=\"margin-top:12px\">Guaranteed allowlist.</h3><div class=\"list\"><div class=\"list-row\"><span>Tier</span><strong>GTD</strong></div><div class=\"list-row\"><span>Next</span><strong>GTD presale on OpenSea</strong></div></div></div>`;return}if(r==='FCFS'){box.innerHTML=`<div class=\"card\"><div class=\"result-badge fcfs\">FCFS</div><h3 style=\"margin-top:12px\">FCFS allowlist.</h3><div class=\"list\"><div class=\"list-row\"><span>Tier</span><strong>FCFS</strong></div><div class=\"list-row\"><span>Guarantee</span><strong>No — first come, first served</strong></div></div></div>`;return}box.innerHTML=`<div class=\"card\"><div class=\"result-badge none\">Public only</div><h3 style=\"margin-top:12px\">Not on the presale allowlists.</h3><p>You can still participate when Public opens on OpenSea.</p></div>`}";
+
+    const liveChecker = `async function runChecker(){
+  const input=document.getElementById('checkerInput');
+  const v=(input?.value||'').trim().toLowerCase();
+  const box=document.getElementById('checkerResult');
+  if(!box)return;
+  box.classList.add('active');
+  if(!/^0x[a-f0-9]{40}$/.test(v)){
+    box.innerHTML='<div class="card"><div class="result-badge none">Invalid wallet</div><p style="margin-top:12px">Enter a valid EVM wallet address.</p></div>';
+    return;
+  }
+  box.innerHTML='<div class="card"><div class="result-badge none">Checking...</div><p style="margin-top:12px">Reading finalized whitelist status.</p></div>';
+  try{
+    const response=await fetch('/api/check',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({wallet:v})
+    });
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok||!data.ok){
+      throw new Error(data.error||'CHECK_FAILED');
+    }
+    const r=data.status;
+    if(r==='GTD'){
+      box.innerHTML='<div class="card"><div class="result-badge gtd">GTD</div><h3 style="margin-top:12px">Guaranteed allowlist.</h3><div class="list"><div class="list-row"><span>Tier</span><strong>GTD</strong></div><div class="list-row"><span>Next</span><strong>GTD presale on OpenSea</strong></div></div></div>';
+      return;
+    }
+    if(r==='FCFS'){
+      box.innerHTML='<div class="card"><div class="result-badge fcfs">FCFS</div><h3 style="margin-top:12px">FCFS allowlist.</h3><div class="list"><div class="list-row"><span>Tier</span><strong>FCFS</strong></div><div class="list-row"><span>Guarantee</span><strong>No — first come, first served</strong></div></div></div>';
+      return;
+    }
+    if(r==='PENDING'){
+      box.innerHTML='<div class="card"><div class="result-badge none">Pending</div><h3 style="margin-top:12px">Application still under review.</h3><p>Your wallet is registered, but a final whitelist decision has not been assigned yet.</p></div>';
+      return;
+    }
+    if(r==='NOT_SELECTED'){
+      box.innerHTML='<div class="card"><div class="result-badge none">Not selected</div><h3 style="margin-top:12px">Not selected for presale.</h3><p>You can still participate when Public opens on OpenSea.</p></div>';
+      return;
+    }
+    box.innerHTML='<div class="card"><div class="result-badge none">Not found</div><h3 style="margin-top:12px">No whitelist application found.</h3><p>Check that you entered the same wallet used for your application.</p></div>';
+  }catch(error){
+    box.innerHTML='<div class="card"><div class="result-badge none">Unavailable</div><h3 style="margin-top:12px">Checker temporarily unavailable.</h3><p>Please try again in a moment.</p></div>';
+  }
+}`;
+
+    if (!html.includes(oldChecker)) {
+      res.statusCode = 500;
+      return res.end('Whitelist checker hook not found.');
+    }
+    html = html.replace(oldChecker, liveChecker);
+
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store');
