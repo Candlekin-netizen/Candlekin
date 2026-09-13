@@ -1,8 +1,4 @@
-module.exports = async function handler(req, res) {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.setHeader('Cache-Control', 'no-store');
-  res.end(`<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
@@ -32,5 +28,4 @@ function resetAndLoad(){S.offset=0;loadData()}
 function move(dir){S.offset=Math.max(0,S.offset+dir*S.limit);loadData()}
 checkAuth();
 </script>
-</body></html>`);
-};
+</body></html>

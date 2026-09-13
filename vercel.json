@@ -7,7 +7,7 @@
     },
     {
       "src": "^/admin/?$",
-      "dest": "/api/admin-page"
+      "dest": "/admin.html"
     },
     {
       "handle": "filesystem"
