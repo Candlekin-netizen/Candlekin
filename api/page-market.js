@@ -1,0 +1,25 @@
+const baseHandler = require('./page-mint-fixed');
+
+module.exports = async function handler(req, res) {
+  let body = '';
+  const headers = new Map();
+  const proxy = {
+    statusCode: 200,
+    setHeader(name, value) { headers.set(String(name).toLowerCase(), value); },
+    getHeader(name) { return headers.get(String(name).toLowerCase()); },
+    end(chunk = '') { body += Buffer.isBuffer(chunk) ? chunk.toString('utf8') : String(chunk); }
+  };
+
+  await baseHandler(req, proxy);
+
+  const contentType = String(headers.get('content-type') || '');
+  if (proxy.statusCode === 200 && contentType.includes('text/html')) {
+    const assets = '<link rel="stylesheet" href="/market-lab.css"><script src="/market-lab.js"></script>';
+    body = body.includes('</body>') ? body.replace('</body>', assets + '</body>') : body + assets;
+  }
+
+  res.statusCode = proxy.statusCode;
+  for (const [name, value] of headers.entries()) res.setHeader(name, value);
+  res.setHeader('Cache-Control', 'no-store');
+  res.end(body);
+};
