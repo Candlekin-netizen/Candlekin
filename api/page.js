@@ -124,6 +124,23 @@ module.exports = async function handler(req, res) {
     }
     html = html.replace(oldChecker, liveChecker);
 
+    // Public-facing cleanup. Internal lifecycle controls remain available only
+    // when the explicit ?internal=1 query parameter is present.
+    const internalMode = String(req.query?.internal || '') === '1';
+
+    html = html
+      .replace('Candlekin production preview — 4,096 hard-pixel market-state characters on Robinhood Chain.', 'Candlekin — 4,096 hard-pixel market-state characters on Robinhood Chain.')
+      .replaceAll('Candlekin — Production Preview', 'Candlekin')
+      .replace('<span class="preview-pill">PROTOTYPE PREVIEW</span>', '')
+      .replace('<div>Preview build. Mint execution will happen on OpenSea.</div>', '<div>Primary mint execution will happen on OpenSea.</div>')
+      .replace('Preview validation is strict: X, wallet, all six answers and the shared X post URL are required.', 'X, wallet, all six answers and the shared X post URL are required.')
+      .replace('>Submit preview</button>', '>Submit application</button>')
+      .replace('Share on X also includes a Candlekin preview link so X can render the card image.', 'Share on X also includes a Candlekin share-card link so X can render the card image.');
+
+    if (!internalMode) {
+      html = html.replace('</head>', '<style>.phasebox{display:none!important}</style></head>');
+    }
+
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store');
