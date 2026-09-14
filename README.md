@@ -34,7 +34,9 @@ Whitelist curation outcomes are mutually exclusive **GTD**, **FCFS**, or **NOT_S
 
 ## Website responsibility
 
-Candlekin.xyz is the project identity, whitelist, allocation-checker, collection and Market Lab layer. Primary mint execution is delegated to OpenSea / SeaDrop. Static website copy does not promise mint price, timing, or wallet limits; those values belong to the active SeaDrop stage configuration.
+Candlekin.xyz is the project identity, whitelist, allocation-checker, ownership and Market Lab layer. Primary mint execution is delegated to OpenSea / SeaDrop. Static website copy does not promise mint price, timing, or wallet limits; those values belong to the active SeaDrop stage configuration.
+
+`My Candlekin` is hidden during Whitelist and Checker phases because no ownership view is needed yet. It becomes available from mint stages onward: sealed ownership before Reveal, final art/traits after Reveal. Market Lab appears only after Reveal.
 
 The `preview` branch intentionally keeps the internal lifecycle selector visible for review. It must be hidden before the final production release.
 
@@ -85,7 +87,8 @@ The final production assignment mechanics remain a separate decision and must no
 ## Official links
 
 - Website: `https://candlekin.xyz`
-- X: `https://x.com/Candlekin`
+- X: `https://x.com/candlekinHQ`
+- X handle: `@candlekinHQ`
 - Testnet explorer: `https://explorer.testnet.chain.robinhood.com/address/0x3D8A54bdee95791D4AE9D9D5163bf6ddA3c607f8`
 
 ## Repository map
@@ -110,7 +113,7 @@ The final production assignment mechanics remain a separate decision and must no
 
 ## Safety rule
 
-Only addresses and mint links published through **Candlekin.xyz** and the official **@Candlekin** account should be treated as canonical. Testnet addresses must never be presented as mainnet mint addresses.
+Only addresses and mint links published through **Candlekin.xyz** and the official **@candlekinHQ** account should be treated as canonical. Testnet addresses must never be presented as mainnet mint addresses.
 
 ---
 
