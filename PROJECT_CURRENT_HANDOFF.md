@@ -18,11 +18,32 @@
 - Genesis Signal is participant identity only and never influences NFT outcome.
 - Visual DNA and Market Genome are separate identity layers.
 - No token dependency for Candlekin v1.
-- Website is the identity / whitelist / collection / Market Lab layer, not the primary mint execution layer.
+- Website is the identity / whitelist / ownership / Market Lab layer, not the primary mint execution layer.
 
 ## Current preview website
 
 The preview branch intentionally exposes the internal lifecycle selector for review. Do not remove it until testnet and lifecycle review are complete. Hide it before final production release.
+
+Navigation behavior:
+
+```text
+WHITELIST_OPEN / WHITELIST_CLOSED
+→ Home / Whitelist / Docs / FAQ
+
+CHECKER_OPEN
+→ Home / Docs / FAQ
+
+GTD_MINT / FCFS_MINT / PUBLIC_MINT
+→ Home / Mint / My Candlekin / Docs / FAQ
+
+SOLD_OUT
+→ Home / My Candlekin / Docs / FAQ
+
+REVEALED
+→ Home / My Candlekin / Market Lab / Docs / FAQ
+```
+
+`My Candlekin` is therefore not exposed during whitelist or checker stages. Before Reveal it is an ownership/sealed view; after Reveal it becomes the final art/traits ownership view.
 
 The expanded Market Lab is loaded through:
 
@@ -37,12 +58,13 @@ vercel.json
        + site-polish.js
 ```
 
-`site-polish.js` owns the current Docs page, official X navigation, wording cleanup and preview-safe project documentation.
+`site-polish.js` owns the current Docs page, official X navigation, lifecycle visibility cleanup and preview-safe wording.
 
 Official X profile:
 
 ```text
-https://x.com/Candlekin
+https://x.com/candlekinHQ
+@candlekinHQ
 ```
 
 ## Backend / whitelist
