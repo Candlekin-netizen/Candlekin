@@ -20,6 +20,7 @@ module.exports = async function handler(req, res) {
       '<link rel="stylesheet" href="/wallet-collection.css">',
       '<script src="/market-lab.js"></script>',
       '<script src="/site-polish.js"></script>',
+      '<script src="/wallet-provider-fix.js"></script>',
       '<script src="/wallet-collection.js"></script>'
     ].join('');
     body = body.includes('</body>') ? body.replace('</body>', assets + '</body>') : body + assets;
