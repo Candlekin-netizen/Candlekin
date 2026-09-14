@@ -1,0 +1,26 @@
+.wallet-hero{padding-bottom:22px}
+.wallet-connected-box{display:inline-flex;align-items:center;gap:11px;border:1px solid #2b4356;background:rgba(255,255,255,.02);border-radius:13px;padding:11px 13px;margin-top:10px}
+.wallet-connected-box>div{display:grid;gap:2px}
+.wallet-connected-box span{font:10px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.wallet-connected-box strong{font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--text)}
+.wallet-inline-error{margin-top:14px;max-width:680px;border:1px solid #75433d;background:rgba(255,124,124,.05);border-radius:12px;padding:12px 14px;color:#e8aaa4;font-size:13px;line-height:1.55}
+.wallet-collection-section{padding-top:20px}
+.wallet-collection-lock,.wallet-collection-state{min-height:260px;border:1px dashed #2b4054;border-radius:18px;background:rgba(255,255,255,.012);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:34px}
+.wallet-collection-lock p,.wallet-collection-state p{max-width:620px}
+.wallet-lock-icon{font-size:26px;color:var(--lime);margin-bottom:14px}
+.wallet-error{border-color:#75433d}
+.wallet-spinner{width:28px;height:28px;border:2px solid #2d4357;border-top-color:var(--lime);border-radius:50%;animation:walletSpin .8s linear infinite;margin-bottom:18px}
+@keyframes walletSpin{to{transform:rotate(360deg)}}
+.wallet-nft-grid{align-items:start}
+.wallet-nft-card{overflow:hidden}
+.wallet-image-link{display:block;text-decoration:none}
+.wallet-image-link img{transition:transform .18s ease,border-color .18s ease}
+.wallet-image-link:hover img{transform:translateY(-2px)}
+.wallet-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.wallet-traits{display:grid;gap:0;border-top:1px solid rgba(255,255,255,.07);margin-top:14px}
+.wallet-trait{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px dashed rgba(255,255,255,.07);font-size:12px}
+.wallet-trait span{color:var(--muted)}
+.wallet-trait strong{color:#dfe7ed;text-align:right;font-weight:600}
+.wallet-muted{font-size:12px;color:var(--muted)}
+.wallet-link-btn{display:inline-flex;align-items:center;text-decoration:none}
+@media(max-width:760px){.wallet-connected-box{width:100%;justify-content:flex-start}.wallet-collection-lock,.wallet-collection-state{min-height:220px;padding:26px 18px}.wallet-card-head{align-items:center}.wallet-trait{font-size:11px}}
