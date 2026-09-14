@@ -17,8 +17,10 @@ module.exports = async function handler(req, res) {
     const assets = [
       '<link rel="stylesheet" href="/market-lab.css">',
       '<link rel="stylesheet" href="/site-polish.css">',
+      '<link rel="stylesheet" href="/wallet-collection.css">',
       '<script src="/market-lab.js"></script>',
-      '<script src="/site-polish.js"></script>'
+      '<script src="/site-polish.js"></script>',
+      '<script src="/wallet-collection.js"></script>'
     ].join('');
     body = body.includes('</body>') ? body.replace('</body>', assets + '</body>') : body + assets;
   }
