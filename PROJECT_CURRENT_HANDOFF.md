@@ -2,108 +2,138 @@
 
 ## Current state
 
-**Phase:** Project Bootstrap / Pre-Production Decision Lock  
+**Phase:** Testnet end-to-end validation / frontend integration  
 **Status:** ACTIVE  
-**Repository:** `Candlekin-netizen/Candlekin`
+**Repository:** `Candlekin-netizen/Candlekin`  
+**Working branch:** `preview`
 
-## Inputs reviewed
+## Locked product shape
 
-- NFT Project Master Production System v1.1
-- Candlekin NFT Master Concept v1
-- Candlekin Full Lifecycle Prototype v13
+- Candlekin: 4,096 ERC-721 NFTs on Robinhood Chain.
+- 2,048 Bullkin / 2,048 Bearkin.
+- Primary mint execution: OpenSea / canonical SeaDrop.
+- Whitelist lifecycle: application → curation → GTD / FCFS / NOT_SELECTED → checker.
+- Mint lifecycle: GTD → FCFS → Public.
+- Blind / delayed reveal, one-way.
+- Genesis Signal is participant identity only and never influences NFT outcome.
+- Visual DNA and Market Genome are separate identity layers.
+- No token dependency for Candlekin v1.
+- Website is the identity / whitelist / collection / Market Lab layer, not the primary mint execution layer.
 
-## What is already known
+## Current preview website
 
-### LOCKED
-- Name: Candlekin
-- Supply: 4,096
-- 2,048 Bullkin / 2,048 Bearkin
-- Robinhood Chain
-- Hard-pixel modular art direction
-- Visual DNA and Market Genome are separate systems
-- 12-bit Market Genome concept
-- Genesis Signal is participant identity only
-- Genesis Signal does not influence NFT outcome
-- Whitelist is an application pool
-- Final curation outcome is only GTD or Public
-- Blind/delayed reveal
-- Same NFT / token ID / owner before and after reveal
-- 4,096 unique Visual DNA goal
-- Approved PNG assets remain production art source
-- Collection experience prioritizes My Candlekin over a full 4,096-token RPC gallery
+The preview branch intentionally exposes the internal lifecycle selector for review. Do not remove it until testnet and lifecycle review are complete. Hide it before final production release.
 
-### CURRENT
-- GTD = one guaranteed free allocation
-- Public mint = 0.0005 ETH
-- GTD before Public
-- Unclaimed GTD returns to public supply
-- 20 solid backgrounds + 6 curated legendary worlds
-- Body Accessory 80%
-- Glasses 70%
-- Body 3 Curved Arms special-trait rule
-- 21 special traits
-- V6B generator direction
-- Market Genome candidate: `MMMM VVVV CCCC`
-- Market Profile band model
-- Market Lab post-Reveal
-- No token dependency for Candlekin v1
-- Google Sheets as simple whitelist curation workbench
-- Merkle allowlist as current GTD implementation direction
+The expanded Market Lab is loaded through:
 
-### TBD / NOT LOCKED
-- Exact GTD count
-- Public wallet limit
-- GTD duration
-- Public start timing
-- Reveal timing
-- Final 4/4/4 Market Genome lock
-- Final Market Profile vocabulary
-- Exact Market Genome assignment algorithm
-- Metadata schema
-- Collection description
-- Image CID
-- Metadata CID
-- Contract implementation / ABI
-- Production RPC / wallet details
-- Marketplace / explorer links
-- Overall rarity ranking policy
-- Genome Atlas release timing
+```text
+vercel.json
+  / → /api/page-market
+       → /api/page-mint-fixed
+       → /api/page
+       + market-lab.css
+       + market-lab.js
+       + site-polish.css
+       + site-polish.js
+```
 
-## Prototype classification
+`site-polish.js` owns the current Docs page, official X navigation, wording cleanup and preview-safe project documentation.
 
-`PRESENTATION_REUSABLE`
+Official X profile:
 
-The existing HTML prototype is useful as a product/visual reference but is not production Web3 code. Mock state must be replaced with authoritative wallet, contract, metadata and application state.
+```text
+https://x.com/Candlekin
+```
 
-## Current recommendation under discussion
+## Backend / whitelist
 
-Preserve the 12-bit `MMMM VVVV CCCC` model:
+Supabase applications are authoritative for whitelist application status.
 
-- Momentum: 4 bits / 0–15
-- Volatility: 4 bits / 0–15
-- Conviction: 4 bits / 0–15
+Statuses:
 
-Use a one-to-one **deterministic shuffled assignment** between the 4,096 token IDs and the 4,096 genome states rather than deriving the final production genome directly from token ID.
+```text
+PENDING
+GTD
+FCFS
+NOT_SELECTED
+```
 
-**Important:** this assignment model is still a recommendation and is not yet marked LOCKED.
+`/api/apply` handles live applications and `/api/check` handles the Allocation Checker.
 
-## Do not do yet
+GTD and FCFS are mutually exclusive. Public is a mint stage, not a whitelist status.
 
-- Do not deploy a contract.
-- Do not freeze metadata.
-- Do not freeze final mint configuration.
-- Do not publish a final metadata CID.
-- Do not treat prototype mock values as production state.
-- Do not imply Market Genome assignment is finalized.
+## Testnet contract
+
+```text
+Network: Robinhood Chain Testnet
+Chain ID: 46630
+Contract: 0x3D8A54bdee95791D4AE9D9D5163bf6ddA3c607f8
+Canonical SeaDrop: 0x00005EA00Ac477B1030CE78506496e8C2dE24bf5
+```
+
+Contract source SHA-256:
+
+```text
+7d2ed352c45145319cecefea2af2d8b345023236ae3855b27c0f90ce2546952f
+```
+
+Completed:
+
+- Phase 0 preflight PASS
+- Phase 1/2 build + 19/19 tests PASS
+- Phase 3 deployment + verification PASS
+- Phase 3.5 gas reconciliation PASS
+- Phase 4 real sealed SeaDrop mint PASS
+- Phase 4.5 hidden metadata correction PASS
+- Phase 5 reveal PASS
+
+Current state after Phase 5 checkpoint:
+
+```text
+totalSupply = 2
+revealed = true
+tokenURI(1) → final /1.json
+tokenURI(2) → final /2.json
+```
+
+This supply value is a checkpoint and will change during the next mint test.
+
+## Important metadata note
+
+The deployed testnet contract's initial constructor hidden URI used the old hidden metadata. It was corrected onchain before reveal via `setHiddenMetadataURI()`.
+
+Before mainnet deployment, update the source constructor default to the corrected hidden metadata URI and re-run the full test suite. Do not redeploy testnet only for that constructor-default correction.
+
+Do not publish final metadata/IPFS mapping as public website documentation before the intended mainnet reveal.
 
 ## Next active task
 
-**Decision Gate — Market Genome**
+**Phase 6 — browser / non-owner mint validation.**
 
-Finalize:
-1. `MMMM VVVV CCCC` structure;
-2. 0–15 axis mapping;
-3. percentage display;
-4. deterministic shuffled token ↔ genome assignment.
+Preferred path:
 
-After this gate passes, move to Market Profile vocabulary.
+1. Owner/agent re-opens a minimal Public test stage on canonical SeaDrop.
+2. Do not let the agent mint the next token.
+3. Preview website exposes an internal testnet mint harness.
+4. User connects a non-owner wallet in the browser.
+5. User mints through canonical SeaDrop.
+6. Verify the newly minted token is owned by that wallet and immediately resolves final metadata because the contract is already revealed.
+7. Verify My Candlekin / Market Lab reads the connected wallet correctly.
+
+After that, validate price reconfiguration and GTD / FCFS allowlists.
+
+## Mainnet gate
+
+Mainnet is NOT authorized yet.
+
+Before mainnet:
+
+- browser non-owner mint PASS;
+- GTD / FCFS allowlist PASS;
+- live price update PASS;
+- update corrected initial hidden metadata URI in source;
+- final production owner / treasury / royalty decisions;
+- final SeaDrop stage parameters;
+- final frontend production cleanup;
+- hide internal lifecycle controls;
+- publish canonical contract and OpenSea link only after verification.

@@ -1,0 +1,12 @@
+.nav a.site-external{color:#b8c3ce;text-decoration:none;padding:8px 0;font-size:13px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.nav a.site-external:hover{color:var(--lime)}
+.docs-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.docs-grid .card{height:100%}
+.docs-code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.7;color:#cfd8e1;overflow-wrap:anywhere}
+.docs-link{color:var(--lime);text-decoration:none}
+.docs-link:hover{text-decoration:underline}
+.docs-callout{border-color:#425729;background:linear-gradient(180deg,rgba(204,255,0,.05),rgba(255,255,255,.01))}
+.footer-links{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.footer-links button,.footer-links a{border:0;background:none;padding:0;color:#aebbc6;text-decoration:none;font:12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;cursor:pointer}
+.footer-links button:hover,.footer-links a:hover{color:var(--lime)}
+@media(max-width:760px){.docs-grid{grid-template-columns:1fr}.nav a.site-external{padding:8px 0}}

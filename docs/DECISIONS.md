@@ -1,98 +1,94 @@
 # CANDLEKIN DECISION REGISTER
 
-This register tracks project-defining decisions separately from implementation details.
+This register separates locked project decisions from items that still require a final production lock.
 
 ## LOCKED
 
 | Decision | Value |
 |---|---|
 | Project name | Candlekin |
+| Collection standard | ERC-721 / ERC721A implementation |
 | Total supply | 4,096 |
 | Family split | 2,048 Bullkin / 2,048 Bearkin |
 | Chain | Robinhood Chain |
 | Art direction | Hard-pixel modular candlestick characters |
 | Visual identity layer | Visual DNA |
-| Post-Reveal identity layer | 12-bit Market Genome |
 | Genesis Signal role | Whitelist participant identity only |
 | Genesis Signal → NFT outcome | No influence |
-| Whitelist role | Application pool, not paid allocation tier |
-| Final curation outcomes | GTD or Public |
-| Reveal model | Blind / delayed reveal |
+| Market Genome role | Separate post-Reveal collectible identity / lore |
+| Market Genome | Not a trading signal, prediction, or ranking |
+| Whitelist model | Application pool |
+| Curation statuses | GTD / FCFS / NOT_SELECTED |
+| GTD and FCFS | Mutually exclusive |
+| Public | Mint stage, not application outcome |
+| Primary mint execution | OpenSea / canonical SeaDrop |
+| Website price display | Do not hard-code sale price in public lifecycle copy |
+| Reveal model | Blind / delayed |
+| Reveal direction | One-way SEALED → REVEALED |
 | Token continuity | Same token ID / owner / contract through Reveal |
-| Production art source | Approved PNG assets + deterministic generator |
+| Max supply | Permanently fixed at 4,096 |
+| Metadata correction | Owner may correct hidden/final URI while sealed; locked after reveal |
+| Public mint bypass | None; mintSeaDrop is canonical SeaDrop-only |
 | Collection product direction | My Candlekin, not a raw 4,096-token RPC gallery |
+| Token dependency | None for Candlekin NFT v1 |
 
-## CURRENT — NOT FINAL LOCK
+## CURRENT / NOT FINAL LOCK
 
 | Decision | Current direction |
 |---|---|
-| GTD | 1 guaranteed free mint allocation |
-| Public mint | 0.0005 ETH / NFT |
-| Mint order | GTD → Public |
-| Unclaimed GTD | Returns to public supply |
-| Background system | 20 solid + 6 curated legendary worlds |
-| Body Accessory | 80% |
-| Glasses | 70% |
-| Special Trait architecture | 21 special traits; Body 3 Curved Arms rule |
-| Generator | V6B current architecture |
-| Market Genome split | MMMM VVVV CCCC |
-| Market Profile | 4 bands per axis |
-| Market Lab | Post-Reveal identity utility |
-| Token dependency | None for Candlekin NFT v1 |
-| GTD allowlist | Merkle |
-| Whitelist curation | Google Sheets workbench |
+| Market Genome structure | `MMMM VVVV CCCC` |
+| Momentum | 4 bits / 0–15 |
+| Volatility | 4 bits / 0–15 |
+| Conviction | 4 bits / 0–15 |
+| Market Profile | Four state bands per axis |
+| Market Lab | Decoder + profile + anatomy + compare + share + atlas |
+| Market Genome assignment | One-to-one shuffled token↔state assignment direction |
+| Production owner | Dedicated production owner / safer ownership setup to be finalized |
+| Royalty configuration | ERC-2981 supported; final policy TBD |
+| GTD stage parameters | Configure in SeaDrop; exact price/count/window TBD |
+| FCFS stage parameters | Configure in SeaDrop; exact price/count/window TBD |
+| Public stage parameters | Configure in SeaDrop; exact price/limit/window TBD |
 
-## PROPOSED DURING BOOTSTRAP — NOT LOCKED
+## IMPLEMENTED / VERIFIED ON TESTNET
 
-### Market Genome assignment
-
-Proposed:
+Robinhood Chain Testnet contract:
 
 ```text
-4096 token IDs
-+
-4096 unique 12-bit genome states
-↓
-deterministic shuffle
-↓
-one unique genome assigned to each token
+0x3D8A54bdee95791D4AE9D9D5163bf6ddA3c607f8
 ```
 
-Goals:
-- no duplicate genome;
-- no missing genome state;
-- reproducible mapping;
-- no wallet/GTD/Genesis/Visual DNA influence;
-- avoid final genome being trivially derived from token ID.
+Verified:
 
-This remains a recommendation until explicitly approved.
+- chain ID 46630;
+- source verified on explorer;
+- runtime bytecode matched local build;
+- `MAX_SUPPLY = 4096`;
+- canonical SeaDrop-only mint path;
+- real public SeaDrop mint while sealed;
+- shared hidden `tokenURI` before reveal;
+- owner correction of hidden metadata while sealed;
+- real one-way reveal at partial supply;
+- token-specific final metadata after reveal;
+- second reveal simulation reverts `AlreadyRevealed()`.
 
-## TBD
+This testnet deployment is validation infrastructure only and is not the mainnet mint contract.
 
-- Exact GTD wallet count
-- GTD claim duration
-- Public per-wallet limit
-- Public mint start timing
-- Reveal timing
-- Final lock of 4/4/4 genome model
+## STILL TBD
+
+- Exact GTD wallet count / allocation parameters
+- GTD timing and price
+- FCFS timing, allocation and price
+- Public wallet limit, timing and price
+- Reveal timing on mainnet
+- Final lock of Market Genome assignment process
 - Final Market Profile vocabulary
-- Exact genome assignment seed/process
-- Metadata schema and exact attribute names
-- Collection description
-- Image CID
-- Metadata CID
-- Contract architecture details / ABI
-- Contract address
-- Royalty policy
-- Treasury model
-- Token ID convention if not already fixed during architecture phase
-- Production RPC provider
-- Wallet connector
-- Domain / hosting
-- Marketplace / explorer links
-- Overall rarity ranking policy
-- Genome Atlas release timing
+- Production owner / treasury setup
+- Final royalty policy
+- Mainnet deployment address
+- Final OpenSea collection / drop URL
+- Production RPC / wallet connector configuration
+- Overall rarity ranking policy, if any
 
 ## Approval rule
 
-A CURRENT or TBD item becomes LOCKED only after an explicit project decision. Do not infer a lock from prototype implementation, mock data, or convenience.
+A CURRENT or TBD item becomes LOCKED only after an explicit project decision. Prototype demo data, testnet parameters and temporary SeaDrop settings are not production promises.

@@ -14,7 +14,12 @@ module.exports = async function handler(req, res) {
 
   const contentType = String(headers.get('content-type') || '');
   if (proxy.statusCode === 200 && contentType.includes('text/html')) {
-    const assets = '<link rel="stylesheet" href="/market-lab.css"><script src="/market-lab.js"></script>';
+    const assets = [
+      '<link rel="stylesheet" href="/market-lab.css">',
+      '<link rel="stylesheet" href="/site-polish.css">',
+      '<script src="/market-lab.js"></script>',
+      '<script src="/site-polish.js"></script>'
+    ].join('');
     body = body.includes('</body>') ? body.replace('</body>', assets + '</body>') : body + assets;
   }
 
