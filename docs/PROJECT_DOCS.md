@@ -78,15 +78,7 @@ Genesis Signal is a **participant identity**, not an NFT attribute.
 - each answer maps to two bits;
 - final display: 12 bits shown as `4-4-4`.
 
-Genesis Signal must not determine:
-
-- GTD / FCFS selection;
-- token ID;
-- Bullkin / Bearkin family;
-- Visual DNA;
-- rarity;
-- final artwork;
-- Market Genome.
+Genesis Signal must not determine GTD / FCFS selection, token ID, family, Visual DNA, rarity, final artwork or Market Genome.
 
 ## 5. Visual DNA
 
@@ -123,17 +115,37 @@ The final production token↔genome assignment mechanism is not yet frozen. Demo
 
 ## 7. Reveal
 
-Before reveal, all minted token IDs resolve to shared sealed metadata.
+Before Reveal, minted token IDs already exist and have owners, but resolve to shared sealed metadata.
 
-After reveal:
+After Reveal:
 
 ```text
 tokenURI(N) → finalBaseURI + N + ".json"
 ```
 
-Reveal is owner-controlled and one-way. The same NFT contract, token ID and owner continue through reveal; only the metadata view changes.
+Reveal is owner-controlled and one-way. The same NFT contract, token ID and owner continue through Reveal; only the metadata view changes.
 
-## 8. Market Lab
+## 8. My Candlekin visibility
+
+`My Candlekin` is an ownership view, so it is intentionally hidden during `WHITELIST_OPEN`, `WHITELIST_CLOSED`, and `CHECKER_OPEN`.
+
+It becomes visible when minting can create owned tokens:
+
+```text
+GTD_MINT / FCFS_MINT / PUBLIC_MINT
+→ My Candlekin shows owned sealed NFTs before Reveal
+
+SOLD_OUT
+→ My Candlekin remains available as sealed ownership view
+
+REVEALED
+→ My Candlekin shows final art and traits
+→ Market Lab becomes available
+```
+
+This avoids showing fake/demo collection ownership during whitelist phases.
+
+## 9. Market Lab
 
 Current product scope:
 
@@ -147,7 +159,7 @@ Current product scope:
 
 Market Lab is an identity explorer, not a market-signal product.
 
-## 9. Website roles
+## 10. Website roles
 
 Candlekin.xyz handles:
 
@@ -155,15 +167,14 @@ Candlekin.xyz handles:
 - whitelist application;
 - Genesis Signal generation;
 - allocation checking;
-- collection ownership experience;
-- My Candlekin;
+- collection ownership / My Candlekin;
 - Market Lab.
 
 OpenSea / SeaDrop handles primary mint execution.
 
 The internal lifecycle selector remains visible only on the preview branch for review and should be hidden in the final production release.
 
-## 10. Testnet validation
+## 11. Testnet validation
 
 Robinhood Chain Testnet:
 
@@ -186,7 +197,7 @@ Completed validation:
 
 The testnet address is not a mainnet mint address.
 
-## 11. Mainnet status
+## 12. Mainnet status
 
 Mainnet is **not deployed yet**.
 
@@ -199,10 +210,11 @@ Before mainnet deployment:
 - complete non-owner browser mint validation and allowlist validation;
 - publish the canonical mainnet contract and OpenSea destination only after verification.
 
-## 12. Official links
+## 13. Official links
 
 - Website: `https://candlekin.xyz`
-- X: `https://x.com/Candlekin`
+- X: `https://x.com/candlekinHQ`
+- X handle: `@candlekinHQ`
 - Testnet explorer: `https://explorer.testnet.chain.robinhood.com/address/0x3D8A54bdee95791D4AE9D9D5163bf6ddA3c607f8`
 
-Do not trust contract or mint links that are not published through the official website or official X account.
+Do not trust contract or mint links that are not published through the official website or official `@candlekinHQ` account.
