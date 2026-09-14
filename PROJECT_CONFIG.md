@@ -190,6 +190,16 @@ page-market
 + site-polish.css / site-polish.js
 ```
 
+Lifecycle page visibility:
+
+```text
+WHITELIST_OPEN / WHITELIST_CLOSED → no My Candlekin
+CHECKER_OPEN → no My Candlekin
+GTD_MINT / FCFS_MINT / PUBLIC_MINT → My Candlekin available as ownership/sealed view
+SOLD_OUT → My Candlekin available as ownership/sealed view
+REVEALED → My Candlekin + Market Lab
+```
+
 Preview keeps `LIFECYCLE // INTERNAL` visible until testnet/lifecycle review is complete. Final production must hide it.
 
 ## Whitelist backend
@@ -203,8 +213,9 @@ Application fields include X username, EVM wallet, six calibration answers, Gene
 ## Official links
 
 WEBSITE: `https://candlekin.xyz`  
-X_PROFILE: `https://x.com/Candlekin`  
-OPENSea_DROP: `NOT PUBLISHED YET`  
+X_PROFILE: `https://x.com/candlekinHQ`  
+X_HANDLE: `@candlekinHQ`  
+OPENSEA_DROP: `NOT PUBLISHED YET`  
 MAINNET_EXPLORER: `NOT PUBLISHED YET`
 
 ## Remaining production gates
