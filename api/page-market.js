@@ -17,6 +17,7 @@ module.exports = async function handler(req, res) {
     const assets = [
       '<link rel="stylesheet" href="/market-lab.css">',
       '<link rel="stylesheet" href="/site-polish.css">',
+      '<link rel="stylesheet" href="/world-home.css">',
       '<link rel="stylesheet" href="/wallet-collection.css">',
       '<link rel="stylesheet" href="/wallet-connect-ui.css">',
       '<link rel="stylesheet" href="/collection-preview.css">',
@@ -24,9 +25,11 @@ module.exports = async function handler(req, res) {
       '<script src="/market-lab.js"></script>',
       '<script src="/site-polish.js"></script>',
       '<script src="/lifecycle-polish.js"></script>',
+      '<script src="/world-home.js"></script>',
       '<script src="/wallet-provider-fix.js"></script>',
       '<script src="/wallet-collection.js"></script>',
       '<script src="/wallet-connect-ui.js"></script>',
+      '<script src="/pre-reveal-polish.js"></script>',
       '<script src="/collection-preview.js"></script>',
       '<script src="/market-lab-owned-preview.js"></script>',
       '<script type="module" src="/reown-appkit.js"></script>'
