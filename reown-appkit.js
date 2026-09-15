@@ -3,14 +3,15 @@ import { WagmiAdapter } from 'https://esm.sh/@reown/appkit-adapter-wagmi@1.8.23?
 import { defineChain } from 'https://esm.sh/@reown/appkit@1.8.23/networks?bundle';
 
 const PROJECT_ID = '4f90a2c28605fc9b93f3b2b9bb2cb71f';
-const TESTNET_ID = 46630;
-const TESTNET_CAIP = `eip155:${TESTNET_ID}`;
+const MAINNET_ID = 4663;
+const MAINNET_CAIP = `eip155:${MAINNET_ID}`;
+const MAINNET_RPC = `${window.location.origin}/api/rpc-mainnet`;
 
-const robinhoodTestnet = defineChain({
-  id: TESTNET_ID,
-  caipNetworkId: TESTNET_CAIP,
+const robinhoodMainnet = defineChain({
+  id: MAINNET_ID,
+  caipNetworkId: MAINNET_CAIP,
   chainNamespace: 'eip155',
-  name: 'Robinhood Chain Testnet',
+  name: 'Robinhood Chain',
   nativeCurrency: {
     name: 'Ether',
     symbol: 'ETH',
@@ -18,19 +19,19 @@ const robinhoodTestnet = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ['https://rpc.testnet.chain.robinhood.com']
+      http: [MAINNET_RPC]
     }
   },
   blockExplorers: {
     default: {
-      name: 'Robinhood Testnet Explorer',
-      url: 'https://explorer.testnet.chain.robinhood.com'
+      name: 'Robinhood Chain Explorer',
+      url: 'https://robinhoodchain.blockscout.com'
     }
   },
-  testnet: true
+  testnet: false
 });
 
-const networks = [robinhoodTestnet];
+const networks = [robinhoodMainnet];
 const wagmiAdapter = new WagmiAdapter({
   projectId: PROJECT_ID,
   networks
@@ -46,7 +47,7 @@ const metadata = {
 const appKit = createAppKit({
   adapters: [wagmiAdapter],
   networks,
-  defaultNetwork: robinhoodTestnet,
+  defaultNetwork: robinhoodMainnet,
   metadata,
   projectId: PROJECT_ID,
   themeMode: 'dark',
@@ -100,8 +101,8 @@ async function handoffProvider(provider, address) {
 
 appKit.subscribeProvider?.(({ provider, address, chainId, isConnected }) => {
   if (isConnected && provider && address) {
-    if (Number(chainId) !== TESTNET_ID) {
-      appKit.switchNetwork?.(robinhoodTestnet).catch?.(() => {});
+    if (Number(chainId) !== MAINNET_ID) {
+      appKit.switchNetwork?.(robinhoodMainnet).catch?.(() => {});
     }
     if (provider !== lastProvider || String(address).toLowerCase() !== String(window.state?.walletAddress || '').toLowerCase()) {
       handoffProvider(provider, address);
@@ -118,7 +119,7 @@ appKit.subscribeProvider?.(({ provider, address, chainId, isConnected }) => {
 window.CandlekinAppKit = {
   ready: true,
   instance: appKit,
-  network: robinhoodTestnet,
+  network: robinhoodMainnet,
   async open() {
     return appKit.open({ view: 'Connect', namespace: 'eip155' });
   },
@@ -139,7 +140,6 @@ window.CandlekinAppKit = {
   }
 };
 
-// Keep Candlekin's existing Disconnect button authoritative while also ending Reown sessions.
 if (typeof localDisconnect === 'function') {
   window.disconnectWallet = async function() {
     try {
