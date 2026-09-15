@@ -33,6 +33,21 @@
     return raw.replace(/^(.{4})(.{4})(.{4})$/,'$1 $2 $3');
   };
 
+  shareOnX=function(){
+    if(!shareGenerated())return;
+    const intent=`https://x.com/intent/post?text=${encodeURIComponent(shareCaption())}&url=${encodeURIComponent(sharePageUrl())}`;
+    state.shareStatus='X opened with your caption and the universal Candlekin share-card link. After posting, paste your X post URL below.';
+    render();
+    const a=document.createElement('a');
+    a.href=intent;
+    a.target='_blank';
+    a.rel='noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+  window.shareOnX=shareOnX;
+
   const priorWhitelistPage=whitelistPage;
   whitelistPage=function(){
     let html=priorWhitelistPage();
