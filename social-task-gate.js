@@ -1,6 +1,6 @@
 (function(){
-  const STORAGE_KEY='candlekin_social_tasks_v1';
-  const TASK_KEYS=['follow','like','repost','comment'];
+  const STORAGE_KEY='candlekin_social_tasks_v2';
+  const TASK_KEYS=['follow','like','repost'];
   const COMPLETE_DELAY_MS=1800;
 
   function loadState(){
@@ -13,7 +13,7 @@
   }
 
   const done=loadState();
-  const opening={follow:false,like:false,repost:false,comment:false};
+  const opening={follow:false,like:false,repost:false};
 
   function save(){
     try{localStorage.setItem(STORAGE_KEY,JSON.stringify(done));}catch(_){}
@@ -23,9 +23,19 @@
     try{return String(SOCIAL_LINKS?.whitelistPost||'').trim();}catch(_){return '';}
   }
 
+  function tweetId(){
+    const url=postUrl();
+    const match=url.match(/\/status\/(\d+)/);
+    return match?match[1]:'';
+  }
+
   function taskUrl(key){
     if(key==='follow') return 'https://x.com/intent/follow?screen_name=candlekinHQ';
-    return postUrl();
+    const id=tweetId();
+    if(!id) return '';
+    if(key==='like') return `https://x.com/intent/like?tweet_id=${id}`;
+    if(key==='repost') return `https://x.com/intent/retweet?tweet_id=${id}`;
+    return '';
   }
 
   function available(key){return Boolean(taskUrl(key));}
@@ -35,7 +45,9 @@
     if(!available(key)) return 'LINK PENDING';
     if(done[key]) return 'DONE ✓';
     if(opening[key]) return 'OPENED…';
-    return key==='follow'?'FOLLOW ON X ↗':'OPEN POST ↗';
+    if(key==='follow') return 'FOLLOW ON X ↗';
+    if(key==='like') return 'LIKE ON X ↗';
+    return 'REPOST ON X ↗';
   }
 
   function cardClass(key){
@@ -62,9 +74,8 @@
   socialTaskHtml=function(){
     const tasks=[
       ['follow','Follow @candlekinHQ','Open the official X follow prompt.'],
-      ['like','Like whitelist post','Open the official whitelist post and like it.'],
-      ['repost','Repost whitelist post','Open the official whitelist post and repost it.'],
-      ['comment','Comment on whitelist post','Open the official whitelist post and leave a comment.']
+      ['like','Like whitelist post','Open the X like prompt for the official whitelist post.'],
+      ['repost','Repost whitelist post','Open the X repost prompt for the official whitelist post.']
     ];
     return `<div class="social-tasks"><div class="social-tasks-head"><div><div class="eyebrow" style="margin-bottom:7px">Social tasks</div><h3 style="margin:0">Support Candlekin on X.</h3></div><p>Open each required X task before submitting your whitelist application.</p></div><div class="social-task-list">${tasks.map(([key,title,desc])=>{
       const isAvailable=available(key);
