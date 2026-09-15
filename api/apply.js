@@ -5,14 +5,19 @@ const json = (res, status, body) => {
   res.end(JSON.stringify(body));
 };
 
-const validX = (value) => /^@?[A-Za-z0-9_]{1,32}$/.test(String(value || '').trim());
+const validX = (value) => /^@?[A-Za-z0-9_]{1,15}$/.test(String(value || '').trim());
 const validWallet = (value) => /^0x[a-fA-F0-9]{40}$/.test(String(value || '').trim());
 
-const validSharedPost = (value) => {
+const validSharedPost = (value, xUsername) => {
   try {
     const u = new URL(String(value || '').trim());
     const host = u.hostname.toLowerCase().replace(/^www\./, '');
-    return (host === 'x.com' || host === 'twitter.com') && /^\/[^/]+\/status\/\d+/.test(u.pathname);
+    const match = u.pathname.match(/^\/([^/]+)\/status\/(\d+)/i);
+    const handle = String(xUsername || '').trim().replace(/^@/, '').toLowerCase();
+    return (host === 'x.com' || host === 'twitter.com')
+      && Boolean(match)
+      && Boolean(handle)
+      && match[1].toLowerCase() === handle;
   } catch {
     return false;
   }
@@ -56,7 +61,7 @@ module.exports = async function handler(req, res) {
   if (!validAnswers(answers)) {
     return json(res, 400, { ok: false, error: 'INVALID_ANSWERS' });
   }
-  if (!validSharedPost(sharedPostUrl)) {
+  if (!validSharedPost(sharedPostUrl, xUsername)) {
     return json(res, 400, { ok: false, error: 'INVALID_SHARED_POST_URL' });
   }
 
