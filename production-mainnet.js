@@ -12,6 +12,18 @@
     return pages;
   };
 
+  const priorHome=home;
+  home=function(){
+    let html=priorHome();
+    if(state.phase==='REVEALED'&&!genomeEnabled()){
+      html=String(html)
+        .replace('Market Lab online','Market Genome pending')
+        .replace('Final artwork and visual traits are visible. Market Lab opens the separate Market Genome identity layer.','Final artwork and visual traits are visible. Market Genome activation remains pending until the production mapping is frozen and verified.')
+        .replace('<button class="btn" type="button" onclick="setPage(\'marketlab\')">Open Market Lab</button>','');
+    }
+    return html;
+  };
+
   const priorMarketLab=marketLab;
   marketLab=function(){
     if(genomeEnabled()) return priorMarketLab();
@@ -25,6 +37,21 @@
       .replace('The official Candlekin mainnet contract address will be published on Candlekin.xyz before the mint opens. Never rely on an address shared only through replies, DMs or unofficial links.', `Canonical Mainnet contract: <span class="mono">${CONTRACT}</span>. Verify it through Candlekin.xyz before interacting with mint links.`)
       .replace('<h3>Official mint destination</h3>', `<h3>Mainnet verification</h3><p><a class="site-external" href="${EXPLORER}" target="_blank" rel="noopener noreferrer">Open contract explorer ↗</a></p><h3>Official mint destination</h3>`);
     return html;
+  };
+
+  document.getElementById('headerCta')?.addEventListener('click',event=>{
+    if(state.phase==='REVEALED'&&!genomeEnabled()){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      setPage('collection');
+    }
+  },true);
+
+  const priorRender=render;
+  render=function(){
+    if(state.phase==='REVEALED'&&!genomeEnabled()) phases.REVEALED.cta='View collection';
+    else phases.REVEALED.cta='Open Market Lab';
+    priorRender();
   };
 
   window.CandlekinProduction={
