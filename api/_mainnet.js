@@ -5,7 +5,7 @@ const SEADROP = '0x00005EA00Ac477B1030CE78506496e8C2dE24bf5';
 
 const rpcUrl = () => process.env.ROBINHOOD_MAINNET_RPC || process.env.ALCHEMY_ROBINHOOD_MAINNET_RPC || '';
 
-async function rpc(method, params = []) {
+async function rawRpc(method, params = []) {
   const url = rpcUrl();
   if (!url) {
     const error = new Error('MAINNET_RPC_NOT_CONFIGURED');
@@ -26,13 +26,27 @@ async function rpc(method, params = []) {
   return body.result;
 }
 
-async function rpcBatch(calls) {
-  const url = rpcUrl();
-  if (!url) {
-    const error = new Error('MAINNET_RPC_NOT_CONFIGURED');
-    error.code = 'MAINNET_RPC_NOT_CONFIGURED';
+let verifiedAt = 0;
+async function assertMainnet() {
+  if (Date.now() - verifiedAt < 60_000) return true;
+  const chain = await rawRpc('eth_chainId');
+  if (!chain || Number(BigInt(chain)) !== CHAIN_ID) {
+    const error = new Error('WRONG_MAINNET_RPC_CHAIN');
+    error.code = 'WRONG_MAINNET_RPC_CHAIN';
     throw error;
   }
+  verifiedAt = Date.now();
+  return true;
+}
+
+async function rpc(method, params = []) {
+  if (method !== 'eth_chainId') await assertMainnet();
+  return rawRpc(method, params);
+}
+
+async function rpcBatch(calls) {
+  await assertMainnet();
+  const url = rpcUrl();
   const payload = calls.map((call, index) => ({
     jsonrpc: '2.0',
     id: index + 1,
@@ -58,4 +72,4 @@ async function rpcBatch(calls) {
   });
 }
 
-module.exports = { CHAIN_ID, CONTRACT, DEPLOY_BLOCK, SEADROP, rpcUrl, rpc, rpcBatch };
+module.exports = { CHAIN_ID, CONTRACT, DEPLOY_BLOCK, SEADROP, rpcUrl, assertMainnet, rpc, rpcBatch };
