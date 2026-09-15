@@ -46,12 +46,15 @@
     }
 
     if(MINT_PHASES.has(state.phase)){
+      const published=Boolean(window.CandlekinMintConfig?.published);
       return worldHero({
-        items:['Mint is live','OpenSea'],
-        eyebrow:'Candlekin // mint live',
-        title:'Mint is live.',
-        lead:'Candlekin minting is live on OpenSea. Access, price, timing and wallet limits follow the active OpenSea / SeaDrop stage.',
-        actions:'<button class="btn" type="button" onclick="setPage(\'mint\')">Enter mint</button><button class="btn secondary" type="button" onclick="setPage(\'collection\')">My Candlekin</button>'
+        items:published?['Mint is live','OpenSea']:['Mint destination pending','OpenSea'],
+        eyebrow:published?'Candlekin // mint live':'Candlekin // mint',
+        title:published?'Mint is live.':'Mint details are being finalized.',
+        lead:published
+          ?'Candlekin minting is live on OpenSea. Access, price, timing and wallet limits follow the active OpenSea / SeaDrop stage.'
+          :'The canonical OpenSea destination will be published here when the mint stage opens. Do not mint from links shared only through replies, DMs or unofficial pages.',
+        actions:'<button class="btn" type="button" onclick="setPage(\'mint\')">'+(published?'Enter mint':'View mint details')+'</button><button class="btn secondary" type="button" onclick="setPage(\'collection\')">My Candlekin</button>'
       })+journeySection()+faq();
     }
 
