@@ -1,21 +1,18 @@
 (function(){
-  const CHAIN_ID_DEC = 46630;
-  const CHAIN_ID_HEX = '0xB626';
-  const CONTRACT = '0x3D8A54bdee95791D4AE9D9D5163bf6ddA3c607f8';
-  const RPC_URL = 'https://rpc.testnet.chain.robinhood.com';
-  const EXPLORER_URL = 'https://explorer.testnet.chain.robinhood.com';
+  const CHAIN_ID_DEC = 4663;
+  const CHAIN_ID_HEX = '0x1237';
+  const CONTRACT = '0x1422F37Cdc2a845B9dB8b5D4faDf9C6AFA1d3A50';
+  const RPC_URL = `${window.location.origin}/api/rpc-mainnet`;
+  const EXPLORER_URL = 'https://robinhoodchain.blockscout.com';
   const LIGHTHOUSE_GATEWAY = 'https://fast-narwhal-vdgsu.lighthouseweb3.xyz/ipfs/';
   const TOKEN_URI_SELECTOR = '0xc87b56dd';
-  const TOTAL_SUPPLY_SELECTOR = '0x18160ddd';
-  const OWNER_OF_SELECTOR = '0x6352211e';
-  const BALANCE_OF_SELECTOR = '0x70a08231';
-  const TESTNET_SCAN_CAP = 512;
 
   state.walletConnected = false;
   state.walletAddress = '';
   state.walletLoading = false;
   state.walletError = '';
   state.walletOwnedData = [];
+  state.owned = [];
 
   let listenersBound = false;
   let boundProvider = null;
@@ -38,26 +35,6 @@
     return BigInt(value).toString(16).padStart(64,'0');
   }
 
-  function encodeAddress(address){
-    return String(address || '').toLowerCase().replace(/^0x/,'').padStart(64,'0');
-  }
-
-  function decodeAddress(raw){
-    if(!raw || raw === '0x') return '';
-    return '0x' + raw.slice(-40).toLowerCase();
-  }
-
-  function decodeUint(raw){
-    if(!raw || raw === '0x') return 0;
-    return Number(BigInt(raw));
-  }
-
-  function ipfsToHttp(uri){
-    if(!uri) return '';
-    if(uri.startsWith('ipfs://')) return LIGHTHOUSE_GATEWAY + uri.slice(7);
-    return uri;
-  }
-
   function decodeAbiString(raw){
     if(!raw || raw === '0x') return '';
     const hex = raw.slice(2);
@@ -71,7 +48,13 @@
     return new TextDecoder().decode(bytes);
   }
 
-  async function ensureTestnet(provider){
+  function ipfsToHttp(uri){
+    if(!uri) return '';
+    if(uri.startsWith('ipfs://')) return LIGHTHOUSE_GATEWAY + uri.slice(7);
+    return uri;
+  }
+
+  async function ensureMainnet(provider){
     if(!provider) throw new Error('No browser wallet detected. Install a wallet that supports EVM networks.');
     const current = await provider.request({method:'eth_chainId'});
     if(String(current).toLowerCase() === CHAIN_ID_HEX.toLowerCase()) return;
@@ -79,7 +62,17 @@
       await provider.request({method:'wallet_switchEthereumChain',params:[{chainId:CHAIN_ID_HEX}]});
     }catch(err){
       if(err && Number(err.code) === 4902){
-        throw new Error('Robinhood Chain Testnet is not configured in this wallet. Add Chain ID 46630 with your working testnet RPC, then try again.');
+        await provider.request({
+          method:'wallet_addEthereumChain',
+          params:[{
+            chainId:CHAIN_ID_HEX,
+            chainName:'Robinhood Chain',
+            nativeCurrency:{name:'Ether',symbol:'ETH',decimals:18},
+            rpcUrls:[RPC_URL],
+            blockExplorerUrls:[EXPLORER_URL]
+          }]
+        });
+        return;
       }
       throw err;
     }
@@ -98,47 +91,18 @@
     return decodeAbiString(await ethCall(TOKEN_URI_SELECTOR + encodeUint(tokenId)));
   }
 
-  async function contractTotalSupply(){
-    return decodeUint(await ethCall(TOTAL_SUPPLY_SELECTOR));
-  }
-
-  async function walletBalance(address){
-    return decodeUint(await ethCall(BALANCE_OF_SELECTOR + encodeAddress(address)));
-  }
-
-  async function tokenOwner(tokenId){
-    return decodeAddress(await ethCall(OWNER_OF_SELECTOR + encodeUint(tokenId)));
-  }
-
   async function getOwnedIds(address){
-    const [supply, expectedBalance] = await Promise.all([
-      contractTotalSupply(),
-      walletBalance(address)
-    ]);
-
-    if(expectedBalance === 0) return [];
-    if(supply > TESTNET_SCAN_CAP){
-      throw new Error(`Testnet ownership reader safety cap reached at ${supply} minted tokens. Production will use an indexed ownership API.`);
+    const response = await fetch(`/api/owned?address=${encodeURIComponent(address)}`, {cache:'no-store'});
+    const data = await response.json().catch(()=>({}));
+    if(!response.ok || !data.ok){
+      const messages={
+        MAINNET_RPC_NOT_CONFIGURED:'Candlekin Mainnet RPC is not configured on the website yet.',
+        OWNERSHIP_INDEX_MISMATCH:'Ownership index is still synchronizing. Try again shortly.',
+        OWNERSHIP_LOOKUP_FAILED:'Unable to read Candlekin ownership from Robinhood Chain.'
+      };
+      throw new Error(messages[data.error] || 'Unable to load Candlekin ownership.');
     }
-
-    const wallet = address.toLowerCase();
-    const mine = [];
-    const batchSize = 20;
-
-    for(let start=1; start<=supply; start+=batchSize){
-      const end = Math.min(supply,start+batchSize-1);
-      const ids = [];
-      for(let id=start; id<=end; id++) ids.push(id);
-      const owners = await Promise.all(ids.map(async id => {
-        try{return await tokenOwner(id)}catch(_){return ''}
-      }));
-      owners.forEach((owner,i) => {
-        if(owner === wallet) mine.push(ids[i]);
-      });
-      if(mine.length >= expectedBalance) break;
-    }
-
-    return mine.sort((a,b)=>a-b);
+    return Array.isArray(data.ids) ? data.ids.map(Number).filter(Number.isFinite).sort((a,b)=>a-b) : [];
   }
 
   async function getTokenData(tokenId){
@@ -200,7 +164,7 @@
         state.walletAddress = '';
         state.walletOwnedData = [];
         state.owned = [];
-        state.walletError = 'Switch to Robinhood Chain Testnet to read My Candlekin.';
+        state.walletError = `Switch to Robinhood Chain Mainnet (Chain ID ${CHAIN_ID_DEC}) to read My Candlekin.`;
         render();
         return;
       }
@@ -213,7 +177,7 @@
     try{
       const provider = walletProvider();
       if(!provider) throw new Error('No browser wallet detected. Install or unlock an EVM wallet first.');
-      await ensureTestnet(provider);
+      await ensureMainnet(provider);
       const accounts = await provider.request({method:'eth_requestAccounts'});
       if(!accounts || !accounts.length) throw new Error('Wallet connection was not approved.');
       state.walletAddress = accounts[0];
@@ -250,13 +214,13 @@
 
   function connectedCollection(){
     if(state.walletLoading){
-      return `<div class="wallet-collection-state"><div class="wallet-spinner"></div><h3>Reading your wallet…</h3><p>Reading ownership from the Candlekin testnet contract, then loading metadata through the Candlekin Lighthouse gateway.</p></div>`;
+      return `<div class="wallet-collection-state"><div class="wallet-spinner"></div><h3>Reading your wallet…</h3><p>Reading ownership from Candlekin on Robinhood Chain Mainnet, then loading metadata through the Candlekin Lighthouse gateway.</p></div>`;
     }
     if(state.walletError){
       return `<div class="wallet-collection-state wallet-error"><h3>Could not load My Candlekin.</h3><p>${escapeHtml(state.walletError)}</p><button class="btn secondary" type="button" onclick="refreshCandlekinWallet()">Try again</button></div>`;
     }
     if(!state.walletOwnedData.length){
-      return `<div class="wallet-collection-state"><div class="eyebrow">0 Candlekin found</div><h3>This wallet does not own a Candlekin on testnet yet.</h3><p>Once this wallet mints or receives a Candlekin, it will appear here automatically.</p><button class="btn secondary" type="button" onclick="refreshCandlekinWallet()">Refresh</button></div>`;
+      return `<div class="wallet-collection-state"><div class="eyebrow">0 Candlekin found</div><h3>This wallet does not own a Candlekin yet.</h3><p>Once this wallet mints or receives a Candlekin on Robinhood Chain Mainnet, it will appear here automatically.</p><button class="btn secondary" type="button" onclick="refreshCandlekinWallet()">Refresh</button></div>`;
     }
     return `<div class="nft-grid wallet-nft-grid">${state.walletOwnedData.map(token=>`<article class="card nft-card wallet-nft-card"><a class="wallet-image-link" href="${escapeHtml(token.metadataUrl)}" target="_blank" rel="noopener noreferrer"><img src="${escapeHtml(token.imageUrl)}" alt="${escapeHtml(token.name)}"></a><div class="wallet-card-head"><div><div class="tiny">Token #${token.id}</div><div class="token">${escapeHtml(token.name)}</div></div><span class="pill">Owned</span></div>${traitRows(token.attributes)}${state.phase==='REVEALED'?`<div class="actions"><button class="btn small" type="button" onclick="openGenome(${token.id})">Open in Market Lab</button><a class="btn small secondary wallet-link-btn" href="${EXPLORER_URL}/token/${CONTRACT}/instance/${token.id}" target="_blank" rel="noopener noreferrer">Explorer ↗</a></div>`:''}</article>`).join('')}</div>`;
   }
@@ -264,7 +228,7 @@
   collectionPage = function(){
     const revealed = state.phase === 'REVEALED';
     const connected = state.walletConnected && state.walletAddress;
-    return `<section class="hero wallet-hero"><div class="wrap hero-grid"><div><div class="eyebrow">Collection // My Candlekin</div><h1>View your Candlekin.</h1><p class="lead">Connect your wallet to read the Candlekin it owns on Robinhood Chain Testnet. Your collection loads directly below on this page.</p>${connected?`<div class="wallet-connected-box"><span class="dot"></span><div><span>Connected wallet</span><strong>${escapeHtml(shortAddress(state.walletAddress))}</strong></div></div><div class="actions"><button class="btn secondary" type="button" onclick="refreshCandlekinWallet()">Refresh collection</button><button class="btn ghost" type="button" onclick="disconnectWallet()">Disconnect</button></div>`:`<div class="actions"><button class="btn" type="button" onclick="connectWallet()">Connect wallet</button></div>${state.walletError?`<div class="wallet-inline-error">${escapeHtml(state.walletError)}</div>`:''}`}</div>${heroArt(revealed?'Revealed collection':'Sealed collection')}</div></section><section class="wallet-collection-section"><div class="wrap"><div class="section-head"><div><div class="eyebrow">Owned tokens</div><h2>Your collection.</h2></div><div class="subtle">Ownership is read directly from the deployed Candlekin testnet contract. ${revealed?'Final metadata and artwork are loaded through the Candlekin Lighthouse IPFS gateway.':'Token ownership is visible while identity remains sealed.'}</div></div>${connected?connectedCollection():`<div class="wallet-collection-lock"><div class="wallet-lock-icon">◆</div><h3>Connect a wallet to view its Candlekin.</h3><p>No demo collection is shown here. This area only displays tokens owned by the connected address.</p><button class="btn" type="button" onclick="connectWallet()">Connect wallet</button></div>`}</div></section>`;
+    return `<section class="hero wallet-hero"><div class="wrap hero-grid"><div><div class="eyebrow">Collection // My Candlekin</div><h1>View your Candlekin.</h1><p class="lead">Connect your wallet to read the Candlekin it owns on Robinhood Chain Mainnet. Your collection loads directly below on this page.</p>${connected?`<div class="wallet-connected-box"><span class="dot"></span><div><span>Connected wallet</span><strong>${escapeHtml(shortAddress(state.walletAddress))}</strong></div></div><div class="actions"><button class="btn secondary" type="button" onclick="refreshCandlekinWallet()">Refresh collection</button><button class="btn ghost" type="button" onclick="disconnectWallet()">Disconnect</button></div>`:`<div class="actions"><button class="btn" type="button" onclick="connectWallet()">Connect wallet</button></div>${state.walletError?`<div class="wallet-inline-error">${escapeHtml(state.walletError)}</div>`:''}`}</div>${heroArt(revealed?'Revealed collection':'Sealed collection')}</div></section><section class="wallet-collection-section"><div class="wrap"><div class="section-head"><div><div class="eyebrow">Owned tokens</div><h2>Your collection.</h2></div><div class="subtle">Ownership is indexed from the deployed Candlekin Mainnet contract. ${revealed?'Final metadata and artwork are loaded through the Candlekin Lighthouse IPFS gateway.':'Token ownership is visible while identity remains sealed.'}</div></div>${connected?connectedCollection():`<div class="wallet-collection-lock"><div class="wallet-lock-icon">◆</div><h3>Connect a wallet to view its Candlekin.</h3><p>No demo collection is shown here. This area only displays tokens owned by the connected address.</p><button class="btn" type="button" onclick="connectWallet()">Connect wallet</button></div>`}</div></section>`;
   };
 
   bindWalletListeners();
