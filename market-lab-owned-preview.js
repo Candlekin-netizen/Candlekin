@@ -4,6 +4,10 @@
   const FINAL_METADATA_CID='bafybeibym2vpueziuqhzd64kahviyin4kqlp4yc3iuvyx4txvdk6k4e37u';
   const collectionCache=new Map();
 
+  // The base scaffold carries sample token IDs for layout work. Never treat them
+  // as user ownership once the real wallet layer is active.
+  if(!state.walletConnected) state.owned=[];
+
   function esc(value){return String(value??'').replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]));}
   function ownedIds(){
     const fromData=(state.walletOwnedData||[]).map(t=>Number(t.id)).filter(Number.isFinite);
