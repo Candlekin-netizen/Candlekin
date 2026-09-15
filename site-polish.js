@@ -49,7 +49,12 @@
       .replaceAll('Official X links will be connected once the profile and whitelist post URLs are final.','The official X profile is live at @candlekinHQ. Whitelist post links will activate when the campaign post is published.')
       .replaceAll('Primary mint execution will happen on OpenSea.','Primary mint execution takes place on OpenSea.')
       .replaceAll('One unique state per NFT after Reveal.','A 12-bit identity state for each NFT after Reveal.')
-      .replaceAll('A unique 12-bit market-state identity revealed after mint.','A 12-bit market-state identity revealed after mint.');
+      .replaceAll('A unique 12-bit market-state identity revealed after mint.','A 12-bit market-state identity revealed after mint.')
+      .replaceAll('Connect your wallet to read the Candlekin it owns on Robinhood Chain Testnet. Your collection loads directly below on this page.','Connect your wallet to view the Candlekin it owns. Your collection loads directly below on this page.')
+      .replaceAll('Reading ownership from the Candlekin testnet contract, then loading metadata through the Candlekin Lighthouse gateway.','Reading wallet ownership, then loading Candlekin metadata.')
+      .replaceAll('This wallet does not own a Candlekin on testnet yet.','This wallet does not own a Candlekin yet.')
+      .replaceAll('Ownership is read directly from the deployed Candlekin testnet contract.','Ownership is read directly from the deployed Candlekin contract.')
+      .replaceAll('No demo collection is shown here. This area only displays tokens owned by the connected address.','Only tokens owned by the connected address are shown here.');
   }
 
   pageHtml=function(){
