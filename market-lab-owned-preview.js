@@ -1,6 +1,32 @@
 (function(){
   function esc(value){return String(value??'').replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]));}
-  function selectedId(){return Number(state.labId||(state.owned&&state.owned[0])||0);}
+  function ownedIds(){
+    const fromData=(state.walletOwnedData||[]).map(t=>Number(t.id)).filter(Number.isFinite);
+    if(fromData.length)return fromData;
+    return (state.owned||[]).map(Number).filter(Number.isFinite);
+  }
+  function normalizeSelection(){
+    if(state.phase!=='REVEALED'||state.page!=='marketlab')return false;
+    const ids=ownedIds();
+    if(!ids.length)return false;
+    let changed=false;
+    const current=Number(state.labId);
+    if(!ids.includes(current)){
+      state.labId=ids[0];
+      changed=true;
+    }
+    const compare=Number(state.compareId);
+    if(!ids.includes(compare)||compare===Number(state.labId)){
+      state.compareId=ids.find(id=>id!==Number(state.labId))||Number(state.labId);
+      changed=true;
+    }
+    return changed;
+  }
+  function selectedId(){
+    const ids=ownedIds();
+    const requested=Number(state.labId);
+    return ids.includes(requested)?requested:Number(ids[0]||requested||0);
+  }
   function tokenData(id){return (state.walletOwnedData||[]).find(t=>Number(t.id)===Number(id))||null;}
   function attr(token,name){
     const target=String(name).toLowerCase();
@@ -59,8 +85,12 @@
   function enhanceCompare(){
     const grid=document.querySelector('.ml-compare-grid');
     if(!grid)return;
+    const idsAvailable=ownedIds();
     const currentId=selectedId();
-    const otherId=Number(state.compareId||((state.owned||[]).find(id=>Number(id)!==currentId))||currentId);
+    const requestedCompare=Number(state.compareId);
+    const otherId=idsAvailable.includes(requestedCompare)&&requestedCompare!==currentId
+      ? requestedCompare
+      : Number(idsAvailable.find(id=>id!==currentId)||currentId);
     const cards=[...grid.querySelectorAll(':scope > .card')];
     const ids=[currentId,otherId];
 
@@ -105,6 +135,12 @@
   };
 
   const baseRender=render;
-  render=function(){baseRender();enhance();};
-  enhance();
+  render=function(){
+    normalizeSelection();
+    baseRender();
+    enhance();
+  };
+
+  if(normalizeSelection()) render();
+  else enhance();
 })();
