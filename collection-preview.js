@@ -18,8 +18,7 @@
   function renderToken(token){
     const id=Number(token.id);
     const imageUrl=token.imageUrl||ipfsToHttp(token.image||'');
-    const metadataUrl=token.metadataUrl||ipfsToHttp(token.uri||'');
-    return `<div class="ck-preview-head"><div class="eyebrow">Candlekin // token preview</div><button class="ck-preview-close" type="button" aria-label="Close preview">×</button></div><div class="ck-preview-body"><div class="ck-preview-art"><img src="${esc(imageUrl)}" alt="${esc(token.name||`Candlekin #${String(id).padStart(4,'0')}`)}"></div><div class="ck-preview-meta"><div class="tiny">Token #${id}</div><h2>${esc(token.name||`Candlekin #${String(id).padStart(4,'0')}`)}</h2><div class="ck-preview-status"><span class="dot"></span><span>Owned by connected wallet</span></div>${traitsHtml(token.attributes)}<div class="ck-preview-actions"><button class="btn" type="button" data-ck-market="${id}">Open in Market Lab</button><a class="btn secondary" href="${esc(imageUrl)}" target="_blank" rel="noopener noreferrer">Open image ↗</a><a class="btn secondary" href="${esc(metadataUrl)}" target="_blank" rel="noopener noreferrer">Metadata ↗</a><a class="btn ghost" href="${EXPLORER}/token/${CONTRACT}/instance/${id}" target="_blank" rel="noopener noreferrer">Explorer ↗</a></div></div></div>`;
+    return `<div class="ck-preview-head"><div class="eyebrow">Candlekin // token preview</div><button class="ck-preview-close" type="button" aria-label="Close preview">×</button></div><div class="ck-preview-body"><div class="ck-preview-art"><img src="${esc(imageUrl)}" alt="${esc(token.name||`Candlekin #${String(id).padStart(4,'0')}`)}"></div><div class="ck-preview-meta"><div class="tiny">Token #${id}</div><h2>${esc(token.name||`Candlekin #${String(id).padStart(4,'0')}`)}</h2><div class="ck-preview-status"><span class="dot"></span><span>Owned by connected wallet</span></div>${traitsHtml(token.attributes)}<div class="ck-preview-actions"><button class="btn" type="button" data-ck-market="${id}">Open in Market Lab</button><a class="btn ghost" href="${EXPLORER}/token/${CONTRACT}/instance/${id}" target="_blank" rel="noopener noreferrer">Explorer ↗</a></div></div></div>`;
   }
   async function openToken(id){
     let token=currentToken(id);
@@ -34,7 +33,7 @@
     try{
       if(!token){
         const card=[...document.querySelectorAll('.wallet-nft-card')].find(el=>el.querySelector('.tiny')?.textContent?.includes(`#${id}`));
-        const metadataUrl=card?.querySelector('.wallet-image-link')?.href||'';
+        const metadataUrl=card?.querySelector('.wallet-image-link')?.dataset?.metadataUrl||card?.dataset?.metadataUrl||'';
         if(!metadataUrl)throw new Error('Token metadata is not loaded yet.');
         const r=await fetch(metadataUrl,{cache:'no-store'});
         if(!r.ok)throw new Error(`Metadata returned HTTP ${r.status}.`);
