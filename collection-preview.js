@@ -1,7 +1,7 @@
 (function(){
   const LIGHTHOUSE_GATEWAY='https://fast-narwhal-vdgsu.lighthouseweb3.xyz/ipfs/';
-  const EXPLORER='https://explorer.testnet.chain.robinhood.com';
-  const CONTRACT='0x3D8A54bdee95791D4AE9D9D5163bf6ddA3c607f8';
+  const EXPLORER='https://robinhoodchain.blockscout.com';
+  const CONTRACT='0x1422F37Cdc2a845B9dB8b5D4faDf9C6AFA1d3A50';
 
   function esc(value){return String(value??'').replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]));}
   function ipfsToHttp(uri){return uri&&uri.startsWith('ipfs://')?LIGHTHOUSE_GATEWAY+uri.slice(7):uri||'';}
@@ -15,10 +15,14 @@
     document.querySelector('.ck-preview-backdrop')?.remove();
     document.body.classList.remove('ck-preview-open');
   }
+  function marketLabReady(){
+    return state.phase==='REVEALED' && (Boolean(window.CandlekinProduction?.genomeProductionReady) || Boolean(window.CandlekinRuntime?.adminPreview));
+  }
   function renderToken(token){
     const id=Number(token.id);
     const imageUrl=token.imageUrl||ipfsToHttp(token.image||'');
-    return `<div class="ck-preview-head"><div class="eyebrow">Candlekin // token preview</div><button class="ck-preview-close" type="button" aria-label="Close preview">×</button></div><div class="ck-preview-body"><div class="ck-preview-art"><img src="${esc(imageUrl)}" alt="${esc(token.name||`Candlekin #${String(id).padStart(4,'0')}`)}"></div><div class="ck-preview-meta"><div class="tiny">Token #${id}</div><h2>${esc(token.name||`Candlekin #${String(id).padStart(4,'0')}`)}</h2><div class="ck-preview-status"><span class="dot"></span><span>Owned by connected wallet</span></div>${traitsHtml(token.attributes)}<div class="ck-preview-actions"><button class="btn" type="button" data-ck-market="${id}">Open in Market Lab</button><a class="btn ghost" href="${EXPLORER}/token/${CONTRACT}/instance/${id}" target="_blank" rel="noopener noreferrer">Explorer ↗</a></div></div></div>`;
+    const marketAction=marketLabReady()?`<button class="btn" type="button" data-ck-market="${id}">Open in Market Lab</button>`:'';
+    return `<div class="ck-preview-head"><div class="eyebrow">Candlekin // token preview</div><button class="ck-preview-close" type="button" aria-label="Close preview">×</button></div><div class="ck-preview-body"><div class="ck-preview-art"><img src="${esc(imageUrl)}" alt="${esc(token.name||`Candlekin #${String(id).padStart(4,'0')}`)}"></div><div class="ck-preview-meta"><div class="tiny">Token #${id}</div><h2>${esc(token.name||`Candlekin #${String(id).padStart(4,'0')}`)}</h2><div class="ck-preview-status"><span class="dot"></span><span>Owned by connected wallet</span></div>${traitsHtml(token.attributes)}<div class="ck-preview-actions">${marketAction}<a class="btn ghost" href="${EXPLORER}/token/${CONTRACT}/instance/${id}" target="_blank" rel="noopener noreferrer">Explorer ↗</a></div></div></div>`;
   }
   async function openToken(id){
     let token=currentToken(id);
