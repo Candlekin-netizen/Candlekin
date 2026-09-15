@@ -1,5 +1,5 @@
-const { isAdmin } = require('./_admin-session');
-const { CHAIN_ID, CONTRACT, SEADROP, rpcUrl } = require('./_mainnet');
+const { isAdmin } = require('../lib/admin-session');
+const { CHAIN_ID, CONTRACT, SEADROP, rpcUrl } = require('../lib/mainnet');
 
 const VALID_PHASES = ['WHITELIST_OPEN','WHITELIST_CLOSED','CHECKER_OPEN','PUBLIC_MINT','SOLD_OUT','REVEALED'];
 const publicPhase = () => {
