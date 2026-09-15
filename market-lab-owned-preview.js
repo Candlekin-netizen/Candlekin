@@ -15,9 +15,23 @@
     if(familyRow?.querySelector('strong'))familyRow.querySelector('strong').textContent=family;
   }
 
+  function clarifyGenomeState(hero){
+    if(!hero)return;
+    const row=[...hero.querySelectorAll('.list-row')].find(item=>item.querySelector('span')?.textContent?.trim()==='State index');
+    if(!row)return;
+    const strong=row.querySelector('strong');
+    const value=(strong?.textContent||'').split('/')[0].trim();
+    row.querySelector('span').textContent='Genome state';
+    if(strong)strong.textContent=value;
+    if(!hero.querySelector('[data-genome-space]')){
+      row.insertAdjacentHTML('afterend','<div class="list-row" data-genome-space><span>State space</span><strong>4,096 combinations</strong></div>');
+    }
+  }
+
   function enhanceHero(){
     const hero=document.querySelector('.ml-token-hero');
     if(!hero)return;
+    clarifyGenomeState(hero);
     const id=selectedId();
     const token=tokenData(id);
     if(!token)return;
@@ -82,7 +96,6 @@
     requestAnimationFrame(()=>window.scrollTo({top:y,left:0,behavior:'auto'}));
   }
 
-  // Market Lab token changes must not throw the user back to the top of the page.
   window.mlSelectToken=function(id){
     renderAtSameScroll(()=>{state.labId=Number(id);});
   };
