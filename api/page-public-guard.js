@@ -58,6 +58,12 @@ module.exports = async function handler(req, res) {
         .replace('One unique state per NFT after Reveal.', 'A 12-bit identity layer after Reveal.')
         .replace('A unique 12-bit market-state identity revealed after mint.', 'A 12-bit market-state identity layer revealed after mint.');
 
+      if (!adminPreview) {
+        body = body
+          .replace('<meta name="robots" content="noindex,nofollow" />', '<meta name="robots" content="index,follow" />')
+          .replace('<meta name="robots" content="noindex,nofollow">', '<meta name="robots" content="index,follow">');
+      }
+
       if (body.includes('Lifecycle // internal') || body.includes('id="phaseSelect"')) {
         throw new Error('Internal lifecycle control survived public guard.');
       }
