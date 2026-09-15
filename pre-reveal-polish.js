@@ -21,9 +21,8 @@
     sealOwnedCards();
   };
 
-  // The testnet contract has already been revealed for validation. During simulated
-  // pre-Reveal lifecycle phases, do not let the UI expose that final metadata via
-  // the internal token preview modal.
+  // During pre-Reveal lifecycle phases, never expose final metadata through the
+  // internal token preview modal even if the underlying metadata is reachable.
   document.addEventListener('click',event=>{
     if(state.phase==='REVEALED') return;
     const card=event.target.closest('.wallet-nft-card');
