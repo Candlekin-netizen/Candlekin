@@ -48,6 +48,7 @@
       .replaceAll('OpenSea URL pending','OpenSea link will appear when the stage opens')
       .replaceAll('Official X links will be connected once the profile and whitelist post URLs are final.','The official X profile is live at @candlekinHQ. Whitelist post links will activate when the campaign post is published.')
       .replaceAll('Primary mint execution will happen on OpenSea.','Primary mint execution takes place on OpenSea.')
+      .replaceAll('4,096 market states.','4,096 market-born identities.')
       .replaceAll('One unique state per NFT after Reveal.','A 12-bit identity state for each NFT after Reveal.')
       .replaceAll('A unique 12-bit market-state identity revealed after mint.','A 12-bit market-state identity revealed after mint.')
       .replaceAll('Connect your wallet to read the Candlekin it owns on Robinhood Chain Testnet. Your collection loads directly below on this page.','Connect your wallet to view the Candlekin it owns. Your collection loads directly below on this page.')
