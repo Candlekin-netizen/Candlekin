@@ -7,7 +7,7 @@
     },
     {
       "src": "^/admin/preview/?$",
-      "dest": "/api/admin-preview-page"
+      "dest": "/api/admin-page?mode=preview"
     },
     {
       "src": "^/admin/?$",
