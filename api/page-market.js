@@ -27,7 +27,8 @@ module.exports = async function handler(req, res) {
       '<script src="/wallet-collection.js"></script>',
       '<script src="/wallet-connect-ui.js"></script>',
       '<script src="/collection-preview.js"></script>',
-      '<script src="/market-lab-owned-preview.js"></script>'
+      '<script src="/market-lab-owned-preview.js"></script>',
+      '<script type="module" src="/reown-appkit.js"></script>'
     ].join('');
     body = body.includes('</body>') ? body.replace('</body>', assets + '</body>') : body + assets;
   }
