@@ -1,4 +1,4 @@
-const { rpcUrl, assertMainnet } = require('./_mainnet');
+const { rpcUrl, assertMainnet } = require('../lib/mainnet');
 
 const ALLOWED = new Set([
   'web3_clientVersion','net_version','eth_chainId','eth_blockNumber','eth_getBalance',
