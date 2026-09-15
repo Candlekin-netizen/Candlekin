@@ -1,4 +1,4 @@
-const { CONTRACT, DEPLOY_BLOCK, rpc, rpcBatch } = require('./_mainnet');
+const { CONTRACT, DEPLOY_BLOCK, rpc, rpcBatch } = require('../lib/mainnet');
 
 const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 const OWNER_OF_SELECTOR = '0x6352211e';
