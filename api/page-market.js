@@ -25,6 +25,7 @@ module.exports = async function handler(req, res) {
       '<script src="/market-lab.js"></script>',
       '<script src="/site-polish.js"></script>',
       '<script src="/social-task-gate.js"></script>',
+      '<script src="/whitelist-final-polish.js"></script>',
       '<script src="/lifecycle-polish.js"></script>',
       '<script src="/world-home.js"></script>',
       '<script src="/wallet-provider-fix.js"></script>',
