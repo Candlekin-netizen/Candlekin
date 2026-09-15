@@ -52,6 +52,8 @@ module.exports = async function handler(req, res) {
         .replace(initialHook, `const initialPhase='${viewPhase}';`)
         .replace("document.getElementById('phaseSelect').addEventListener", "document.getElementById('phaseSelect')?.addEventListener")
         .replace("document.getElementById('phaseToggle').addEventListener", "document.getElementById('phaseToggle')?.addEventListener")
+        .replace("document.getElementById('phaseHelp').textContent=meta.help;", "document.getElementById('phaseHelp')&&(document.getElementById('phaseHelp').textContent=meta.help);")
+        .replace("document.getElementById('phaseSelect').value=state.phase;", "document.getElementById('phaseSelect')&&(document.getElementById('phaseSelect').value=state.phase);")
         .replace('4,096 market states.', '4,096 market-born identities.')
         .replace('One unique state per NFT after Reveal.', 'A 12-bit identity layer after Reveal.')
         .replace('A unique 12-bit market-state identity revealed after mint.', 'A 12-bit market-state identity layer revealed after mint.');
