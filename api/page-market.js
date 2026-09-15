@@ -22,7 +22,6 @@ module.exports = async function handler(req, res) {
       '<link rel="stylesheet" href="/wallet-connect-ui.css">',
       '<link rel="stylesheet" href="/collection-preview.css">',
       '<link rel="stylesheet" href="/market-lab-owned-preview.css">',
-      '<link rel="stylesheet" href="/phase6-mint.css">',
       '<script src="/market-lab.js"></script>',
       '<script src="/site-polish.js"></script>',
       '<script src="/lifecycle-polish.js"></script>',
@@ -31,7 +30,6 @@ module.exports = async function handler(req, res) {
       '<script src="/wallet-collection.js"></script>',
       '<script src="/wallet-connect-ui.js"></script>',
       '<script src="/pre-reveal-polish.js"></script>',
-      '<script src="/phase8-allowlist.js"></script>',
       '<script src="/collection-preview.js"></script>',
       '<script src="/market-lab-owned-preview.js"></script>',
       '<script type="module" src="/reown-appkit.js"></script>'
