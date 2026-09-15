@@ -1,6 +1,6 @@
 (function(){
   const COLLECTION_SIZE=4096;
-  const tokenIds = () => (state.owned && state.owned.length ? state.owned : [1842,2291,3807]);
+  const tokenIds = () => (state.owned && state.owned.length ? state.owned.map(Number).filter(Number.isFinite) : []);
 
   function mlBits(bits){ return String(bits || '').replace(/\s/g,''); }
   function mlSegment(bits,start){ return mlBits(bits).slice(start,start+4); }
@@ -17,7 +17,7 @@
     return Math.min(COLLECTION_SIZE,Math.max(1,n));
   }
   function mlDefaultCompareId(currentId){
-    const ownedOther=tokenIds().map(Number).find(id=>id!==Number(currentId));
+    const ownedOther=tokenIds().find(id=>id!==Number(currentId));
     if(ownedOther)return ownedOther;
     return Number(currentId)>=COLLECTION_SIZE?1:Number(currentId)+1;
   }
@@ -72,10 +72,18 @@
     const d=demoOwned[currentId] || {family:'Candlekin'};
     return `<section><div class="wrap"><div class="section-head"><div><div class="eyebrow">Genome share</div><h2>Share the decoded identity.</h2></div><div class="subtle">This is separate from the whitelist Genesis Signal. It represents the NFT itself after Reveal.</div></div><div class="status-grid"><div class="card ml-share-card"><div class="eyebrow">Candlekin // Market Genome</div><div class="ml-share-token">#${String(currentId).padStart(4,'0')} <span>${d.family}</span></div><div class="bitline">${g.bits}</div><div class="ml-share-signature">${profile.name}</div><div class="ml-share-footer"><span>Momentum ${g.mp}%</span><span>Volatility ${g.vp}%</span><span>Conviction ${g.cp}%</span></div></div><div class="card"><div class="eyebrow">Share actions</div><h3>Post-Reveal identity card.</h3><p>Share this Candlekin's decoded Market Genome as its identity layer.</p><div class="actions"><button class="btn" type="button" onclick="mlShareOnX()">Share on X</button><button class="btn secondary" type="button" onclick="mlCopyGenome()">Copy genome text</button></div><div id="mlShareStatus" class="field-help" style="margin-top:14px"></div></div></div></div></section>`;
   }
+  function mlAccessGate(){
+    const connected=Boolean(state.walletConnected&&state.walletAddress);
+    return `<section class="hero"><div class="wrap hero-grid"><div><div class="chips"><span class="chip"><span class="dot"></span>Market Lab online</span><span class="chip">Post-Reveal identity explorer</span></div><div class="eyebrow">Candlekin // Market Lab</div><h1>${connected?'No Candlekin found in this wallet.':'Connect your wallet to enter Market Lab.'}</h1><p class="lead">${connected?'Market Lab starts from a Candlekin you own. If this wallet receives a Candlekin, refresh My Candlekin and return here.':'Market Lab starts from a Candlekin you own, then lets you compare its Market Genome with any revealed token in the collection.'}</p><div class="actions">${connected?'<button class="btn" type="button" onclick="setPage(\'collection\')">Open My Candlekin</button>':'<button class="btn" type="button" onclick="connectWallet()">Connect wallet</button>'}<button class="btn secondary" type="button" onclick="setPage('docs')">How Market Lab works</button></div></div>${heroArt('Market Lab')}</div></section>`;
+  }
 
   marketLab=function(){
     if(state.phase!=='REVEALED') return home();
-    const currentId=Number(state.labId || tokenIds()[0] || 1842);
+    const ids=tokenIds();
+    if(!ids.length)return mlAccessGate();
+    const requested=Number(state.labId);
+    const currentId=ids.includes(requested)?requested:ids[0];
+    if(Number(state.labId)!==currentId)state.labId=currentId;
     const g=demoGenomeFor(currentId);
     const d=demoOwned[currentId] || {family:'Candlekin'};
     const profile=mlProfile(g);
@@ -84,7 +92,9 @@
 
   window.mlSelectToken=function(id){ state.labId=Number(id); render(); window.scrollTo({top:0,behavior:'smooth'}); };
   window.mlSetCompare=function(id){
-    const currentId=Number(state.labId||tokenIds()[0]||1);
+    const ids=tokenIds();
+    if(!ids.length)return;
+    const currentId=Number(state.labId||ids[0]);
     state.compareId=mlNormalizedCompareId(currentId,id);
     render();
     setTimeout(()=>document.querySelector('.ml-compare-toolbar')?.scrollIntoView({behavior:'smooth',block:'start'}),40);
@@ -94,20 +104,26 @@
     if(input)window.mlSetCompare(input.value);
   };
   window.mlRandomCompare=function(){
-    const currentId=Number(state.labId||tokenIds()[0]||1);
+    const ids=tokenIds();
+    if(!ids.length)return;
+    const currentId=Number(state.labId||ids[0]);
     let id=currentId;
     while(id===currentId)id=1+Math.floor(Math.random()*COLLECTION_SIZE);
     window.mlSetCompare(id);
   };
   window.mlCopyGenome=async function(){
-    const id=Number(state.labId||tokenIds()[0]||1842), g=demoGenomeFor(id), p=mlProfile(g);
+    const ids=tokenIds();
+    if(!ids.length)return;
+    const id=Number(state.labId||ids[0]), g=demoGenomeFor(id), p=mlProfile(g);
     const text=`Candlekin #${String(id).padStart(4,'0')}\nMarket Genome: ${g.bits}\nProfile: ${p.name}\n\n@Candlekin // Market Lab`;
     const status=document.getElementById('mlShareStatus');
     try{ await navigator.clipboard.writeText(text); if(status) status.textContent='Genome text copied.'; }
     catch{ if(status) status.textContent='Copy failed. Select and copy manually.'; }
   };
   window.mlShareOnX=function(){
-    const id=Number(state.labId||tokenIds()[0]||1842), g=demoGenomeFor(id), p=mlProfile(g);
+    const ids=tokenIds();
+    if(!ids.length)return;
+    const id=Number(state.labId||ids[0]), g=demoGenomeFor(id), p=mlProfile(g);
     const text=`Candlekin #${String(id).padStart(4,'0')}\n${g.bits}\n${p.name}\n\n@Candlekin // Market Lab`;
     const url=`https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(location.origin)}`;
     window.open(url,'_blank','noopener,noreferrer');
