@@ -45,10 +45,13 @@ module.exports = async function handler(req, res) {
       if (!body.includes(requestedHook) || !body.includes(initialHook)) {
         throw new Error('Lifecycle initialization hooks not found.');
       }
+
       body = body
         .replace('const internalMode=true;', 'const internalMode=false;')
         .replace(requestedHook, 'const requestedPhase=null;')
         .replace(initialHook, `const initialPhase='${viewPhase}';`)
+        .replace("document.getElementById('phaseSelect').addEventListener", "document.getElementById('phaseSelect')?.addEventListener")
+        .replace("document.getElementById('phaseToggle').addEventListener", "document.getElementById('phaseToggle')?.addEventListener")
         .replace('4,096 market states.', '4,096 market-born identities.')
         .replace('One unique state per NFT after Reveal.', 'A 12-bit identity layer after Reveal.')
         .replace('A unique 12-bit market-state identity revealed after mint.', 'A 12-bit market-state identity layer revealed after mint.');
