@@ -18,12 +18,14 @@ module.exports = async function handler(req, res) {
       '<link rel="stylesheet" href="/market-lab.css">',
       '<link rel="stylesheet" href="/site-polish.css">',
       '<link rel="stylesheet" href="/wallet-collection.css">',
+      '<link rel="stylesheet" href="/wallet-connect-ui.css">',
       '<link rel="stylesheet" href="/collection-preview.css">',
       '<link rel="stylesheet" href="/market-lab-owned-preview.css">',
       '<script src="/market-lab.js"></script>',
       '<script src="/site-polish.js"></script>',
       '<script src="/wallet-provider-fix.js"></script>',
       '<script src="/wallet-collection.js"></script>',
+      '<script src="/wallet-connect-ui.js"></script>',
       '<script src="/collection-preview.js"></script>',
       '<script src="/market-lab-owned-preview.js"></script>'
     ].join('');
