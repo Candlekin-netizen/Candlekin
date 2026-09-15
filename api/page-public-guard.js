@@ -1,5 +1,5 @@
 const baseHandler = require('./page-market');
-const { isAdmin } = require('./_admin-session');
+const { isAdmin } = require('../lib/admin-session');
 
 const VALID_PHASES = new Set([
   'WHITELIST_OPEN',
