@@ -5,6 +5,8 @@
 .ml-compare-art-button{display:block;width:172px;max-width:42%;border:0;background:transparent;padding:0;margin:14px auto 18px;cursor:pointer}
 .ml-compare-art-button img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;border:1px solid #263b4d;transition:transform .18s ease,border-color .18s ease}
 .ml-compare-art-button:hover img{transform:translateY(-2px);border-color:#526a43}
+.ml-compare-art-static{cursor:default}
+.ml-compare-art-static:hover img{transform:none;border-color:#263b4d}
 .ml-compare-art-empty{margin:14px auto 18px;padding:14px;border:1px dashed #32485a;border-radius:12px;color:var(--muted);font-size:11px;line-height:1.5;max-width:260px;text-align:center}
 @media(max-width:1120px){.ml-token-hero{max-width:420px}}
 @media(max-width:760px){.ml-token-hero{max-width:none;justify-self:stretch}.ml-compare-art-button{width:140px;max-width:50%}}
