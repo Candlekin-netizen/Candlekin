@@ -75,7 +75,12 @@ module.exports = async function handler(req, res) {
     });
   } catch (error) {
     console.error('Owned tokens lookup failed', error?.code || error?.message || error);
-    const status = error?.code === 'MAINNET_RPC_NOT_CONFIGURED' ? 503 : 502;
-    return json(res, status, { ok: false, error: error?.code === 'MAINNET_RPC_NOT_CONFIGURED' ? 'MAINNET_RPC_NOT_CONFIGURED' : 'OWNERSHIP_LOOKUP_FAILED' });
+    if (error?.code === 'MAINNET_RPC_NOT_CONFIGURED') {
+      return json(res, 503, { ok: false, error: 'MAINNET_RPC_NOT_CONFIGURED' });
+    }
+    if (error?.code === 'WRONG_MAINNET_RPC_CHAIN') {
+      return json(res, 503, { ok: false, error: 'WRONG_MAINNET_RPC_CHAIN' });
+    }
+    return json(res, 502, { ok: false, error: 'OWNERSHIP_LOOKUP_FAILED' });
   }
 };
