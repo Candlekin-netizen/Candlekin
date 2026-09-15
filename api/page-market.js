@@ -31,7 +31,7 @@ module.exports = async function handler(req, res) {
       '<script src="/wallet-collection.js"></script>',
       '<script src="/wallet-connect-ui.js"></script>',
       '<script src="/pre-reveal-polish.js"></script>',
-      '<script src="/phase6-mint.js"></script>',
+      '<script src="/phase8-allowlist.js"></script>',
       '<script src="/collection-preview.js"></script>',
       '<script src="/market-lab-owned-preview.js"></script>',
       '<script type="module" src="/reown-appkit.js"></script>'
