@@ -7,29 +7,89 @@
     const hit=(token?.attributes||[]).find(a=>String(a.trait_type||'').toLowerCase()===target);
     return hit?String(hit.value??'—'):'';
   }
-  function traitSummary(token){
-    const wanted=['Family','Background','Body','Head','Body Accessory','Glasses','Special Trait'];
-    const rows=wanted.map(name=>[name,attr(token,name)]).filter(([,value])=>value&&value!=='—').slice(0,6);
-    if(!rows.length)return '';
-    return `<div class="ml-owned-traits">${rows.map(([name,value])=>`<div class="ml-owned-trait"><span>${esc(name)}</span><strong>${esc(value)}</strong></div>`).join('')}</div>`;
+
+  function updateFamily(container,token){
+    const family=attr(token,'Family');
+    if(!family||!container)return;
+    const familyRow=[...container.querySelectorAll('.list-row')].find(row=>row.querySelector('span')?.textContent?.trim()==='Family');
+    if(familyRow?.querySelector('strong'))familyRow.querySelector('strong').textContent=family;
   }
-  function enhance(){
-    if(state.phase!=='REVEALED'||state.page!=='marketlab')return;
+
+  function enhanceHero(){
     const hero=document.querySelector('.ml-token-hero');
-    if(!hero||hero.querySelector('.ml-owned-preview'))return;
+    if(!hero)return;
     const id=selectedId();
     const token=tokenData(id);
+    if(!token)return;
 
-    if(token){
-      const family=attr(token,'Family');
-      const familyRow=[...hero.querySelectorAll('.list-row')].find(row=>row.querySelector('span')?.textContent?.trim()==='Family');
-      if(family&&familyRow?.querySelector('strong'))familyRow.querySelector('strong').textContent=family;
-      hero.insertAdjacentHTML('beforeend',`<div class="ml-owned-preview"><div class="ml-owned-preview-head"><div class="eyebrow">Selected artwork</div><span class="pill">Owned</span></div><button class="ml-owned-art-button" type="button" data-ml-art="${id}" aria-label="Preview ${esc(token.name)}"><img src="${esc(token.imageUrl)}" alt="${esc(token.name)}"></button><div class="ml-owned-art-copy"><h3>${esc(token.name)}</h3><p class="ml-owned-preview-note">The artwork shown here is the revealed token owned by the connected wallet. The pod image above remains the Market Lab visual system.</p>${traitSummary(token)}</div></div>`);
-      hero.querySelector('[data-ml-art]')?.addEventListener('click',()=>window.CandlekinPreview?.openToken(id));
-    }else{
-      hero.insertAdjacentHTML('beforeend',`<div class="ml-owned-preview"><div class="eyebrow">Selected artwork</div><div class="ml-owned-preview-empty">Connect the owning wallet in My Candlekin to load the revealed artwork beside its Market Genome.</div></div>`);
+    const image=hero.querySelector('img');
+    if(image){
+      image.src=token.imageUrl;
+      image.alt=token.name;
+      image.classList.add('ml-selected-art');
+      image.setAttribute('role','button');
+      image.setAttribute('tabindex','0');
+      image.setAttribute('aria-label',`Preview ${token.name}`);
+      image.onclick=()=>window.CandlekinPreview?.openToken(id);
+      image.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();window.CandlekinPreview?.openToken(id);}};
     }
+    updateFamily(hero,token);
   }
+
+  function compareImage(id){
+    const token=tokenData(id);
+    if(!token)return `<div class="ml-compare-art-empty">Artwork loads from the connected wallet.</div>`;
+    return `<button class="ml-compare-art-button" type="button" data-compare-art="${id}" aria-label="Preview ${esc(token.name)}"><img src="${esc(token.imageUrl)}" alt="${esc(token.name)}"></button>`;
+  }
+
+  function enhanceCompare(){
+    const grid=document.querySelector('.ml-compare-grid');
+    if(!grid)return;
+    const currentId=selectedId();
+    const otherId=Number(state.compareId||((state.owned||[]).find(id=>Number(id)!==currentId))||currentId);
+    const cards=[...grid.querySelectorAll(':scope > .card')];
+    const ids=[currentId,otherId];
+
+    cards.slice(0,2).forEach((card,index)=>{
+      const id=ids[index];
+      const token=tokenData(id);
+      const eyebrow=card.querySelector('.eyebrow');
+      if(eyebrow&&!card.querySelector('.ml-compare-art-button,.ml-compare-art-empty')){
+        eyebrow.insertAdjacentHTML('afterend',compareImage(id));
+      }
+      if(token){
+        const family=attr(token,'Family');
+        const heading=card.querySelector('h3');
+        if(family&&heading)heading.textContent=family;
+      }
+    });
+
+    grid.querySelectorAll('[data-compare-art]').forEach(button=>{
+      button.addEventListener('click',()=>window.CandlekinPreview?.openToken(Number(button.dataset.compareArt)));
+    });
+  }
+
+  function enhance(){
+    if(state.phase!=='REVEALED'||state.page!=='marketlab')return;
+    enhanceHero();
+    enhanceCompare();
+  }
+
+  function renderAtSameScroll(mutator){
+    const y=window.scrollY;
+    mutator();
+    render();
+    requestAnimationFrame(()=>window.scrollTo({top:y,left:0,behavior:'auto'}));
+  }
+
+  // Market Lab token changes must not throw the user back to the top of the page.
+  window.mlSelectToken=function(id){
+    renderAtSameScroll(()=>{state.labId=Number(id);});
+  };
+
+  window.mlSetCompare=function(id){
+    renderAtSameScroll(()=>{state.compareId=Number(id);});
+  };
 
   const baseRender=render;
   render=function(){baseRender();enhance();};
