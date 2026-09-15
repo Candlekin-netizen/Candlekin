@@ -7,11 +7,11 @@
     },
     {
       "src": "^/admin/preview/?$",
-      "dest": "/api/admin-page?mode=preview"
+      "dest": "/api/admin-page"
     },
     {
       "src": "^/admin/?$",
-      "dest": "/api/admin-page"
+      "dest": "/admin.html"
     },
     {
       "handle": "filesystem"
