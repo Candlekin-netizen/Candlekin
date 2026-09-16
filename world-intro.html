@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#050b12" />
+  <meta name="description" content="Candlekin — 4,096 market-born identities on Robinhood Chain." />
+  <meta property="og:title" content="Candlekin" />
+  <meta property="og:description" content="A world born from the market." />
+  <title>Candlekin</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #050b12;
+      --ink: #eef2e8;
+      --muted: rgba(238, 242, 232, 0.55);
+      --lime: #d8ff56;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    body { font-family: "Cinzel", serif; }
+
+    .site {
+      position: relative;
+      width: 100%;
+      height: 100svh;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .world {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    .site.entered .world { opacity: 1; }
+
+    .world video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      background: #000;
+    }
+
+    .world::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(to bottom, rgba(2, 7, 12, 0.24), transparent 28%),
+        linear-gradient(to top, rgba(2, 7, 12, 0.16), transparent 30%);
+    }
+
+    .world-brand {
+      position: absolute;
+      z-index: 3;
+      top: 28px;
+      left: 50%;
+      transform: translate(-50%, -8px);
+      color: var(--ink);
+      font-family: "Cinzel", serif;
+      font-size: clamp(16px, 1.2vw, 21px);
+      font-weight: 600;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      opacity: 0;
+      filter: blur(2px);
+      text-shadow:
+        0 0 18px rgba(0, 0, 0, 0.72),
+        0 0 30px rgba(216, 255, 86, 0.10);
+      transition:
+        opacity 1.15s ease,
+        transform 1.15s cubic-bezier(.22,.8,.28,1),
+        filter 1.15s ease;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .site.show-brand .world-brand {
+      opacity: 0.96;
+      transform: translate(-50%, 0);
+      filter: blur(0);
+    }
+
+    .entry {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 50% 45%, rgba(16, 27, 39, 0.9), rgba(5, 11, 18, 0.98) 52%, #03070c 100%);
+      cursor: pointer;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 900ms ease, visibility 900ms step-end;
+    }
+
+    .entry::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: radial-gradient(circle at center, #000 15%, transparent 78%);
+      pointer-events: none;
+    }
+
+    .site.entered .entry {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .entry-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transform: translateY(-1vh);
+      user-select: none;
+    }
+
+    .entry-kicker {
+      margin-bottom: 15px;
+      color: rgba(216, 255, 86, 0.7);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 10px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+    }
+
+    .entry-title {
+      color: var(--ink);
+      font-family: "Cinzel", serif;
+      font-size: clamp(38px, 5.6vw, 82px);
+      font-weight: 600;
+      line-height: 0.95;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-shadow:
+        0 12px 40px rgba(0,0,0,.55),
+        0 0 34px rgba(216, 255, 86, 0.04);
+    }
+
+    .entry-line {
+      width: min(160px, 28vw);
+      height: 1px;
+      margin: 28px 0 20px;
+      background: linear-gradient(90deg, transparent, rgba(216,255,86,.7), transparent);
+    }
+
+    .entry-hint {
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      animation: breathe 2.4s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: 0.42; }
+      50% { opacity: 0.9; }
+    }
+
+    .fade-bridge {
+      position: absolute;
+      inset: 0;
+      z-index: 6;
+      background: #03070c;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 450ms ease;
+    }
+
+    .site.transitioning .fade-bridge { opacity: 0.38; }
+
+    @media (max-width: 640px) {
+      .world-brand { top: 20px; font-size: 14px; letter-spacing: 0.24em; }
+      .entry-kicker { font-size: 9px; }
+      .entry-hint { font-size: 9px; letter-spacing: 0.22em; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .entry-hint { animation: none; }
+      .world, .entry, .world-brand, .fade-bridge { transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="site" id="site">
+    <section class="world" aria-label="Candlekin world">
+      <video id="worldVideo" muted loop playsinline preload="auto" disablepictureinpicture>
+        <source src="https://res.cloudinary.com/ikz1skpl/video/upload/v1789538385/0916_1.mp4" type="video/mp4" />
+      </video>
+      <div class="world-brand">Candlekin</div>
+    </section>
+
+    <div class="fade-bridge" aria-hidden="true"></div>
+
+    <section class="entry" id="entry" role="button" tabindex="0" aria-label="Follow the signal into Candlekin">
+      <div class="entry-inner">
+        <div class="entry-kicker">A world born from the market</div>
+        <h1 class="entry-title">Candlekin</h1>
+        <div class="entry-line"></div>
+        <div class="entry-hint">Follow the signal</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const site = document.getElementById('site');
+    const entry = document.getElementById('entry');
+    const video = document.getElementById('worldVideo');
+    let entered = false;
+
+    async function enterWorld() {
+      if (entered) return;
+      entered = true;
+      site.classList.add('transitioning');
+
+      try {
+        video.currentTime = 0;
+        await video.play();
+      } catch (error) {
+        console.warn('Video playback was blocked:', error);
+      }
+
+      requestAnimationFrame(() => site.classList.add('entered'));
+      setTimeout(() => site.classList.remove('transitioning'), 700);
+      setTimeout(() => site.classList.add('show-brand'), 1000);
+    }
+
+    entry.addEventListener('click', enterWorld);
+    entry.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        enterWorld();
+      }
+    });
+  </script>
+</body>
+</html>
