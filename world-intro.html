@@ -66,10 +66,11 @@
       content: "";
       position: absolute;
       inset: 0;
+      z-index: 1;
       pointer-events: none;
       background:
-        linear-gradient(to bottom, rgba(2, 7, 12, 0.24), transparent 28%),
-        linear-gradient(to top, rgba(2, 7, 12, 0.16), transparent 30%);
+        linear-gradient(to bottom, rgba(2, 7, 12, 0.28), transparent 28%),
+        linear-gradient(to top, rgba(2, 7, 12, 0.26), transparent 32%);
     }
 
     .world-brand {
@@ -102,6 +103,96 @@
       opacity: 0.96;
       transform: translate(-50%, 0);
       filter: blur(0);
+    }
+
+    .world-ui {
+      position: absolute;
+      z-index: 4;
+      opacity: 0;
+      transition:
+        opacity 900ms ease,
+        transform 900ms cubic-bezier(.22,.8,.28,1);
+    }
+
+    .site.show-hud .world-ui { opacity: 1; }
+
+    .x-link {
+      top: 25px;
+      right: 28px;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: rgba(238, 242, 232, 0.78);
+      border: 1px solid rgba(238, 242, 232, 0.18);
+      background: rgba(3, 7, 12, 0.16);
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      text-decoration: none;
+      transform: translateY(-6px);
+      transition:
+        opacity 900ms ease,
+        transform 900ms cubic-bezier(.22,.8,.28,1),
+        color 250ms ease,
+        border-color 250ms ease,
+        background 250ms ease;
+    }
+
+    .site.show-hud .x-link { transform: translateY(0); }
+
+    .x-link:hover {
+      color: var(--lime);
+      border-color: rgba(216, 255, 86, 0.45);
+      background: rgba(3, 7, 12, 0.34);
+    }
+
+    .x-link svg { width: 14px; height: 14px; display: block; }
+
+    .world-meta {
+      left: 30px;
+      bottom: 26px;
+      transform: translateY(8px);
+      color: rgba(238, 242, 232, 0.72);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 10px;
+      line-height: 1.75;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-shadow: 0 2px 14px rgba(0,0,0,.75);
+    }
+
+    .site.show-hud .world-meta { transform: translateY(0); }
+
+    .world-meta strong {
+      display: block;
+      color: rgba(238, 242, 232, 0.92);
+      font-weight: 500;
+    }
+
+    .access-state {
+      right: 30px;
+      bottom: 28px;
+      transform: translateY(8px);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: rgba(238, 242, 232, 0.70);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-shadow: 0 2px 14px rgba(0,0,0,.75);
+    }
+
+    .site.show-hud .access-state { transform: translateY(0); }
+
+    .access-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--lime);
+      box-shadow: 0 0 12px rgba(216,255,86,.45);
+      opacity: .82;
     }
 
     .entry {
@@ -202,14 +293,44 @@
     .site.transitioning .fade-bridge { opacity: 0.38; }
 
     @media (max-width: 640px) {
-      .world-brand { top: 20px; font-size: 14px; letter-spacing: 0.24em; }
+      .world-brand {
+        top: 20px;
+        font-size: 14px;
+        letter-spacing: 0.24em;
+      }
+
+      .x-link {
+        top: 16px;
+        right: 16px;
+        width: 32px;
+        height: 32px;
+      }
+
+      .world-meta {
+        left: 17px;
+        bottom: 17px;
+        max-width: 58vw;
+        font-size: 8px;
+        line-height: 1.65;
+        letter-spacing: 0.12em;
+      }
+
+      .access-state {
+        right: 17px;
+        bottom: 18px;
+        font-size: 8px;
+        letter-spacing: 0.10em;
+        gap: 6px;
+      }
+
+      .access-dot { width: 5px; height: 5px; }
       .entry-kicker { font-size: 9px; }
       .entry-hint { font-size: 9px; letter-spacing: 0.22em; }
     }
 
     @media (prefers-reduced-motion: reduce) {
       .entry-hint { animation: none; }
-      .world, .entry, .world-brand, .fade-bridge { transition-duration: 0.01ms !important; }
+      .world, .entry, .world-brand, .world-ui, .fade-bridge { transition-duration: 0.01ms !important; }
     }
   </style>
 </head>
@@ -219,7 +340,24 @@
       <video id="worldVideo" muted loop playsinline preload="auto" disablepictureinpicture>
         <source src="https://res.cloudinary.com/ikz1skpl/video/upload/v1789538385/0916_1.mp4" type="video/mp4" />
       </video>
+
       <div class="world-brand">Candlekin</div>
+
+      <a class="world-ui x-link" href="https://x.com/candlekinHQ" target="_blank" rel="noopener noreferrer" aria-label="Candlekin on X">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/>
+        </svg>
+      </a>
+
+      <div class="world-ui world-meta">
+        <strong>4,096 market-born identities</strong>
+        <span>Built on Robinhood Chain</span>
+      </div>
+
+      <div class="world-ui access-state">
+        <span class="access-dot" aria-hidden="true"></span>
+        <span>Access // Not yet open</span>
+      </div>
     </section>
 
     <div class="fade-bridge" aria-hidden="true"></div>
@@ -255,6 +393,7 @@
       requestAnimationFrame(() => site.classList.add('entered'));
       setTimeout(() => site.classList.remove('transitioning'), 700);
       setTimeout(() => site.classList.add('show-brand'), 1000);
+      setTimeout(() => site.classList.add('show-hud'), 1450);
     }
 
     entry.addEventListener('click', enterWorld);
